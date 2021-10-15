@@ -132,10 +132,10 @@ while					{return symbol(WHILE);}
 "*"						{return symbol(STAR);}
 "/"						{return symbol(SLASH);}
 
+[0-9]+					{return symbolIntVal(INTLIT, atoi(yytext));}
+0x[0-9a-fA-F]+			{return symbolIntVal(INTLIT, strtol(yytext+2, 0, 16));} // evtl 0x entfernen
 [a-zA-z_][a-zA-Z_0-9]*  {return symbolIdentVal(IDENT, newIdentifier(yytext));}
 
-[0-9]+					{return symbolIntVal(INTLIT, atoi(yytext));}
-0x[0-9a-fA-F]+			{return symbolIntVal(INTLIT, atoi(yytext));} // evtl 0x entfernen
 
 .|\n                    {illegalCharacter(currentPosition, yytext[0]);}
 
