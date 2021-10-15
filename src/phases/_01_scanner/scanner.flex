@@ -97,6 +97,46 @@ static Position currentPosition = {1, 1};
 %%
 
     // TODO (assignment 1): The regular expressions for all tokens need to be defined here.
+
+
+[ \t]					{advanceColumnCounter();}
+"//".*\r?\n				{advancePositionToNextLine();}
+\r?\n                   {advancePositionToNextLine();}
+array					{return symbol(ARRAY);}
+else					{return symbol(ELSE);}
+if						{return symbol(IF);}
+of						{return symbol(OF);}
+proc					{return symbol(PROC);}
+ref						{return symbol(REF);}
+type					{return symbol(TYPE);}
+var						{return symbol(VAR);}
+while					{return symbol(WHILE);}
+"("						{return symbol(LPAREN);}
+")"						{return symbol(RPAREN);}
+"["						{return symbol(LBRACK);}
+"]"						{return symbol(RBRACK);}
+"{"						{return symbol(LCURL);}
+"}"						{return symbol(RCURL);}
+"="						{return symbol(EQ);}
+"#"						{return symbol(NE);}
+"<"						{return symbol(LT);}
+"<="					{return symbol(LE);}
+">"						{return symbol(GT);}
+">="					{return symbol(GE);}
+":="					{return symbol(ASGN);}
+":"						{return symbol(COLON);}
+","						{return symbol(COMMA);}
+";"						{return symbol(SEMIC);}
+"+"						{return symbol(PLUS);}
+"-"						{return symbol(MINUS);}
+"*"						{return symbol(STAR);}
+"/"						{return symbol(SLASH);}
+
+[a-zA-z_][a-zA-Z_0-9]*  {return symbolIdentVal(IDENT, newIdentifier(yytext));}
+
+[0-9]+					{return symbolIntVal(INTLIT, atoi(yytext));}
+0x[0-9a-fA-F]+			{return symbolIntVal(INTLIT, atoi(yytext));} // evtl 0x entfernen
+
 .|\n                    {illegalCharacter(currentPosition, yytext[0]);}
 
 %%
