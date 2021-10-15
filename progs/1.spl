@@ -1,0 +1,9 @@
+proc main(){
+	var a: int;
+	var b: int;
+	var sum: int;
+	readi(a);
+	readi(b);
+	sum := a + b;
+	printi(sum);
+}

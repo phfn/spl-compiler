@@ -1,0 +1,18 @@
+proc fak(n: int, ref res: int){
+    var fak_n_1: int;
+    if (n = 0){
+        res := 1;
+    } else {
+        fak(n-1, fak_n_1);
+        res := n * fak_n_1;
+    }
+
+}
+
+proc main(){
+	var n: int;
+	var res: int;
+	readi(n);
+	fak(n, res);
+	printi(res);
+}

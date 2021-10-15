@@ -1,0 +1,42 @@
+type A8 = array [8] of int;
+
+proc swap(ref a: int, ref b: int){
+	var c: int;
+	c := a;
+	a := b;
+	b := c;
+}
+
+proc sort(ref arr: A8){
+	var i: int;
+	var stop: int;
+	//stop when the no entry is swapped
+	stop := 0;
+	while (stop = 0){
+		stop := 1;
+		i := 0;
+		while(i < 7){
+			if(arr[i] > arr[i+1]){
+				swap(arr[i], arr[i+1]);
+				stop := 0;
+			}
+			i := i+1;
+		}
+	}
+
+}
+proc main(){
+	var arr: A8;
+	var i: int;
+	i := 0;
+	while (i < 8){
+		readi(arr[i]);
+		i := i +1;
+	}
+	sort(arr);
+	i := 0;
+	while (i < 8){
+		printi(arr[i]);
+		i := i +1;
+	}
+}
