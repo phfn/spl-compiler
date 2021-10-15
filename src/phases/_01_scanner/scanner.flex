@@ -134,7 +134,7 @@ while					{return symbol(WHILE);}
 
 [0-9]+					{return symbolIntVal(INTLIT, atoi(yytext));}
 0x[0-9a-fA-F]+			{return symbolIntVal(INTLIT, strtol(yytext+2, 0, 16));} // evtl 0x entfernen
-[a-zA-z_][a-zA-Z_0-9]*  {return symbolIdentVal(IDENT, newIdentifier(yytext));}
+[a-zA-Z_][a-zA-Z_0-9]*  {return symbolIdentVal(IDENT, newIdentifier(yytext));}
 
 
 .|\n                    {illegalCharacter(currentPosition, yytext[0]);}
