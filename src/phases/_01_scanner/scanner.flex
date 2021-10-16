@@ -96,7 +96,7 @@ static int symbolIntVal(int type, int value) {
 
 %%
 
-// TODO (assignment 1): The regular expressions for all tokens need to be defined here.
+    // TODO (assignment 1): The regular expressions for all tokens need to be defined here.
 
 
 [ \t]					{advanceColumnCounter();}
