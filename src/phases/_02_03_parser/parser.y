@@ -25,7 +25,7 @@ void yyerror(Program**, char *);
 }
 
 %token-table
-%expect 0 //TODO Change?
+%expect 1 //TODO Change?
 %parse-param {Program** program}
 
 %union {
@@ -57,12 +57,136 @@ void yyerror(Program**, char *);
 %token	<noVal>		PLUS MINUS STAR SLASH
 %token	<identVal>	IDENT
 %token	<intVal>	INTLIT
+/* %type	<globalDeclarationList>	GlobalDeclarationList; */
+/* %type	<globalDeclarationList>	NonEmptyGlobalDeclarationList; */
+/* %type	<globalDeclaration>		GlobalDeclaration; */
+/* %type	<globalDeclaration>		ProcDeclaration; */
+/* %type	<globalDeclaration>		TypeDeclaration; */
+
+/* %type	<typeExpression>		TypeExpression; */
+
+/* %type	<statementList>			StatementList; */
+/* %type	<statementList>			NonEmptyStatementList; */
+/* %type	<statement>				IfStatement; */
+/* %type	<statement>				WhileStatement; */
+/* %type	<statement>				AssignStatement; */
+/* %type	<statement>				CallStatement; */
+/* %type	<statement>				EmptyStatement; */
+/* %type	<statement>				CompoundStatement; */
+
+/* %type	<parameterList>			ParameterDeclarationList; */
+/* %type	<parameterDeclaration>	ParameterDeclaration; */
+
+/* %type	<variableList>			VariableDeclarationList; */
+/* %type	<variableDeclaration>	VariableDeclaration; */
+
+/* %type	<expressionList>		ExpressionList; */
+/* %type	<expression>			Expression; */
+
+
+
 
 %start			program
+/* ** */
 
 %%
 
-program			: INTLIT; //TODO (assignment 2 and 3): Just a dummy, needs to be replaced by the actual spl grammar.
+program							: GlobalDeclarationList
+								;
+
+GlobalDeclarationList			: 
+								| NonEmptyGlobalDeclarationList
+								;
+
+NonEmptyGlobalDeclarationList	: GlobalDeclaration
+								| GlobalDeclaration NonEmptyGlobalDeclarationList
+								;
+
+
+GlobalDeclaration				: ProcDeclaration
+								| TypeDeclaration
+								;
+
+TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC
+								;
+
+
+ProcDeclaration					: PROC IDENT LPAREN ParameterDeclarationList RPAREN LCURL VariableDeclarationList StatementList RCURL
+								;
+
+StatementList					: 
+								| NonEmptyStatementList
+								;
+
+NonEmptyStatementList			: Statement
+								| Statement NonEmptyStatementList
+								;
+
+Statement						: CallStatement
+								| CompoundStatement
+								| AssignStatement
+								| IfStatement
+								| WhileStatement
+								| EmptyStatement
+								/* | DoWhileStatement */
+								;
+
+EmptyStatement					: SEMIC
+								;
+
+CompoundStatement				: LCURL StatementList RCURL
+								;
+
+AssignStatement					: IDENT COLON EQ Expression SEMIC
+								;
+
+/* IfStatement						: IF LPAREN BoolExpression RPAREN Statement */
+/* 								| IF LPAREN BoolExpression RPAREN Statement ELSE Statement */
+IfStatement						: IF LPAREN Expression RPAREN Statement
+								| IF LPAREN Expression RPAREN Statement ELSE Statement
+								;
+
+/* WhileStatement					: WHILE LPAREN BoolExpression RPAREN Statement */
+WhileStatement					: WHILE LPAREN Expression RPAREN Statement
+								;
+
+
+CallStatement					: IDENT LPAREN ParameterDeclarationList RPAREN SEMIC
+								;
+
+
+/* BoolExpression					: Expression ComparisonOperator Expression */
+								/* ; */
+
+/* ComparisonOperator				: EQ */
+/* 								| NE */
+/* 								| LT */
+/* 								| LE */
+/* 								| GT */
+/* 								| GE */
+/* 								; */
+
+ParameterDeclarationList		: ParameterDeclaration
+								| ParameterDeclaration COMMA ParameterDeclarationList
+								;
+
+ParameterDeclaration			: 
+								|     IDENT COLON TypeExpression
+								| REF IDENT COLON TypeExpression
+								;
+
+TypeExpression					: IDENT
+								| ARRAY LBRACK INTLIT RBRACK OF TypeExpression
+								;
+
+
+/* < + = */
+Expression						: INTLIT
+								| LPAREN Expression RPAREN
+								;
+
+VariableDeclarationList			: VAR IDENT COLON TypeExpression
+								;
 
 %%
 
