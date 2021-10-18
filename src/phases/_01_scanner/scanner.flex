@@ -134,10 +134,10 @@ while					{return symbol(WHILE);}
 "*"						{return symbol(STAR);}
 "/"						{return symbol(SLASH);}
 
-\'\\n\'                 {return symbolIntVal(INTLIT, 10);}
-\'.\'                   {return symbolIntVal(INTLIT, (int)yytext[1]);}
+'\\n'                   {return symbolIntVal(INTLIT, 10);}
+'.'                     {return symbolIntVal(INTLIT, (int)yytext[1]);}
 [0-9]+					{return symbolIntVal(INTLIT, atoi(yytext));}
-0x[0-9a-fA-F]+			{return symbolIntVal(INTLIT, strtol(yytext+2, 0, 16));}
+0x[0-9a-fA-F]+			{return symbolIntVal(INTLIT, strtol(yytext+2, 0, 16));} // evtl 0x entfernen
 [a-zA-Z_][a-zA-Z_0-9]*  {return symbolIdentVal(IDENT, newIdentifier(yytext));}
 
 
