@@ -103,7 +103,7 @@ NonEmptyGlobalDeclarationList	: GlobalDeclaration
 								;
 
 
-GlobalDeclaration				: ProcDeclaration
+GlobalDeclaration				: ProcDeclaration //{$$=new GlobalDeclaration($1);}
 								| TypeDeclaration
 								;
 
@@ -175,18 +175,56 @@ ParameterDeclaration			:
 								| REF IDENT COLON TypeExpression
 								;
 
+VariableDeclarationList			: VAR IDENT COLON TypeExpression SEMIC
+								;
+
 TypeExpression					: IDENT
 								| ARRAY LBRACK INTLIT RBRACK OF TypeExpression
 								;
 
 
 /* < + = */
-Expression						: INTLIT
-								| LPAREN Expression RPAREN
+/* Expression						: INTLIT */
+/* 								| LPAREN Expression RPAREN */
+/* 								| Expression PLUS Expression */
+								/* ; */
+
+Expression						: ExpressionLower
 								;
 
-VariableDeclarationList			: VAR IDENT COLON TypeExpression
+// < > <= >= = #
+ExpressionLower					: ExpressionLower ComparisonOperator ExpressionLow
+								| ExpressionLow
 								;
+
+// + -
+ExpressionLow					: ExpressionLow PlusMinusOperator ExpressionMid
+								| ExpressionMid
+								;
+
+// * /
+ExpressionMid					: ExpressionMid MulDivOperator ExpressionHigh
+								| ExpressionHigh
+								;
+
+ExpressionHigh					: MINUS ExpressionHigh
+								| ExpressionHigher
+								;
+
+/* Klammern oder intlit */
+ExpressionHigher				: LPAREN ExpressionLower RPAREN
+								| INTLIT
+								;
+
+PlusMinusOperator				: PLUS
+								| MINUS
+								;
+
+MulDivOperator					: STAR
+								| SLASH
+								;
+
+ComparisonOperator				: LT | LE | GT | GE | EQ | NE ;
 
 %%
 
