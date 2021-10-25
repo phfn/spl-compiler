@@ -137,7 +137,7 @@ EmptyStatement					: SEMIC
 CompoundStatement				: LCURL StatementList RCURL
 								;
 
-AssignStatement					: IDENT COLON EQ Expression SEMIC
+AssignStatement					: IDENT ASGN Expression SEMIC
 								;
 
 /* IfStatement						: IF LPAREN BoolExpression RPAREN Statement */
@@ -206,14 +206,15 @@ ExpressionLow					: ExpressionLow PlusMinusOperator ExpressionMid
 ExpressionMid					: ExpressionMid MulDivOperator ExpressionHigh
 								| ExpressionHigh
 								;
-
-ExpressionHigh					: MINUS ExpressionHigh
+// -1
+ExpressionHigh					: MINUS ExpressionHigher
 								| ExpressionHigher
 								;
 
 /* Klammern oder intlit */
 ExpressionHigher				: LPAREN ExpressionLower RPAREN
 								| INTLIT
+								| IDENT
 								;
 
 PlusMinusOperator				: PLUS
