@@ -57,6 +57,7 @@ void yyerror(Program**, char *);
 %token	<noVal>		PLUS MINUS STAR SLASH
 %token	<identVal>	IDENT
 %token	<intVal>	INTLIT
+
 /* %type	<globalDeclarationList>	GlobalDeclarationList; */
 /* %type	<globalDeclarationList>	NonEmptyGlobalDeclarationList; */
 /* %type	<globalDeclaration>		GlobalDeclaration; */
@@ -94,14 +95,13 @@ void yyerror(Program**, char *);
 program							: GlobalDeclarationList
 								;
 
-GlobalDeclarationList			: 
+GlobalDeclarationList			:
 								| NonEmptyGlobalDeclarationList
 								;
 
 NonEmptyGlobalDeclarationList	: GlobalDeclaration
 								| GlobalDeclaration NonEmptyGlobalDeclarationList
 								;
-
 
 GlobalDeclaration				: ProcDeclaration //{$$=new GlobalDeclaration($1);}
 								| TypeDeclaration
@@ -110,9 +110,29 @@ GlobalDeclaration				: ProcDeclaration //{$$=new GlobalDeclaration($1);}
 TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC
 								;
 
-
 ProcDeclaration					: PROC IDENT LPAREN ParameterDeclarationList RPAREN LCURL VariableDeclarationList StatementList RCURL
 								;
+
+ParameterDeclarationList		: ParameterDeclaration
+								| ParameterDeclaration COMMA ParameterDeclarationList
+								;
+
+ParameterDeclaration			:
+								|     IDENT COLON TypeExpression
+								| REF IDENT COLON TypeExpression
+								;
+
+VariableDeclarationList			:
+								| VariableDeclaration VariableDeclarationList
+								;
+
+VariableDeclaration				: VAR IDENT COLON TypeExpression SEMIC
+								;
+
+TypeExpression					: IDENT
+								| ARRAY LBRACK INTLIT RBRACK OF TypeExpression
+								;
+
 
 StatementList					: 
 								| NonEmptyStatementList
@@ -150,36 +170,12 @@ IfStatement						: IF LPAREN Expression RPAREN Statement
 WhileStatement					: WHILE LPAREN Expression RPAREN Statement
 								;
 
-
-CallStatement					: IDENT LPAREN ParameterDeclarationList RPAREN SEMIC
+CallStatement					: IDENT LPAREN ParameterList RPAREN SEMIC
 								;
 
-
-/* BoolExpression					: Expression ComparisonOperator Expression */
-								/* ; */
-
-/* ComparisonOperator				: EQ */
-/* 								| NE */
-/* 								| LT */
-/* 								| LE */
-/* 								| GT */
-/* 								| GE */
-/* 								; */
-
-ParameterDeclarationList		: ParameterDeclaration
-								| ParameterDeclaration COMMA ParameterDeclarationList
-								;
-
-ParameterDeclaration			: 
-								|     IDENT COLON TypeExpression
-								| REF IDENT COLON TypeExpression
-								;
-
-VariableDeclarationList			: VAR IDENT COLON TypeExpression SEMIC
-								;
-
-TypeExpression					: IDENT
-								| ARRAY LBRACK INTLIT RBRACK OF TypeExpression
+ParameterList					:
+								| Expression
+								| Expression COMMA ParameterList
 								;
 
 
