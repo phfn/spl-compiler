@@ -157,7 +157,7 @@ EmptyStatement					: SEMIC
 CompoundStatement				: LCURL StatementList RCURL
 								;
 
-AssignStatement					: IDENT ASGN Expression SEMIC
+AssignStatement					: Variable ASGN Expression SEMIC
 								;
 
 /* IfStatement						: IF LPAREN BoolExpression RPAREN Statement */
@@ -209,8 +209,19 @@ ExpressionHigh					: MINUS ExpressionHigher
 
 /* Klammern oder intlit */
 ExpressionHigher				: LPAREN ExpressionLower RPAREN
+								| Value
+								;
+
+Value							: Variable
 								| INTLIT
-								| IDENT
+								;
+
+Variable						: IDENT
+								| IDENT Arrayzeugs
+								;
+
+Arrayzeugs						: LBRACK Expression RBRACK
+								| Arrayzeugs LBRACK Expression RBRACK
 								;
 
 PlusMinusOperator				: PLUS
