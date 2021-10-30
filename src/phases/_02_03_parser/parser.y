@@ -113,12 +113,15 @@ TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC
 ProcDeclaration					: PROC IDENT LPAREN ParameterDeclarationList RPAREN LCURL VariableDeclarationList StatementList RCURL
 								;
 
-ParameterDeclarationList		: ParameterDeclaration
-								| ParameterDeclaration COMMA ParameterDeclarationList
+ParameterDeclarationList		: 
+								| NonEmptyParameterDeclarationList
 								;
 
-ParameterDeclaration			:
-								|     IDENT COLON TypeExpression
+NonEmptyParameterDeclarationList: ParameterDeclaration
+								| ParameterDeclaration COMMA NonEmptyParameterDeclarationList
+								;
+
+ParameterDeclaration			:     IDENT COLON TypeExpression
 								| REF IDENT COLON TypeExpression
 								;
 
