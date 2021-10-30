@@ -174,8 +174,11 @@ CallStatement					: IDENT LPAREN ParameterList RPAREN SEMIC
 								;
 
 ParameterList					:
-								| Expression
-								| Expression COMMA ParameterList
+								| NonEmptyParameterList
+								;
+
+NonEmptyParameterList			: Expression
+								| Expression COMMA NonEmptyParameterList
 								;
 
 
