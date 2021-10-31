@@ -92,15 +92,15 @@ void yyerror(Program**, char *);
 
 %%
 
-program							: GlobalDeclarationList
+program							: GlobalDeclarationList { *program = newProgram(newPosition(1,1), $1);}
 								;
 
-GlobalDeclarationList			:
-								| NonEmptyGlobalDeclarationList
+GlobalDeclarationList			: { $$ = emptyGlobalDeclarationList();}
+								| NonEmptyGlobalDeclarationList { $$ = $1;}
 								;
 
-NonEmptyGlobalDeclarationList	: GlobalDeclaration
-								| GlobalDeclaration NonEmptyGlobalDeclarationList
+NonEmptyGlobalDeclarationList	: GlobalDeclaration { $$ = newGlobalDeclarationList($1, EmptyGlobalDeclarationList());}
+								| GlobalDeclaration NonEmptyGlobalDeclarationList { $$ = newGlobalDeclarationList($1, $2);}
 								;
 
 GlobalDeclaration				: ProcDeclaration //{$$=new GlobalDeclaration($1);}
