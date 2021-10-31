@@ -14,11 +14,11 @@ def get_files(folder: str) -> list:
 
 
 files = [file for file in get_files("progs") if ".spl" in str(file)]
+files.sort()
 spl_ref = "./eco32tools/bin/refspl"
 spl_our = "./build/spl"
 
 for file in files:
-    print(file + "✓")
     our = run([spl_our, "--parse", file], capture_output=True, check=False)
     ref = run([spl_ref, "--parse", file], capture_output=True, check=False)
     if our.stdout == ref.stdout:
