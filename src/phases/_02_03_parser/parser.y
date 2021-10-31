@@ -103,54 +103,68 @@ NonEmptyGlobalDeclarationList	: GlobalDeclaration { $$ = newGlobalDeclarationLis
 								| GlobalDeclaration NonEmptyGlobalDeclarationList { $$ = newGlobalDeclarationList($1, $2);}
 								;
 
-GlobalDeclaration				: ProcDeclaration //{$$=new GlobalDeclaration($1);}
-								| TypeDeclaration
+GlobalDeclaration				: ProcDeclaration {$$ = $1}
+								| TypeDeclaration {$$ = $1}
 								;
 
-TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC
+TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC {newTypeDeclaration($1.position, $2.val, $4)}
 								;
 
 ProcDeclaration					: PROC IDENT LPAREN ParameterDeclarationList RPAREN LCURL VariableDeclarationList StatementList RCURL
+									{ $$ = newProcedureDeclaration($1.position, $2.val, $4, $7, $8)}
 								;
 
-ParameterDeclarationList		: 
-								| NonEmptyParameterDeclarationList
+ParameterDeclarationList		: {$$ = emptyParameterList()}
+								| NonEmptyParameterDeclarationList { $$ = $1 }
 								;
 
 NonEmptyParameterDeclarationList: ParameterDeclaration
+									{ $$ = newParameterList($1, emptyParameterList()) }
 								| ParameterDeclaration COMMA NonEmptyParameterDeclarationList
+									{ $$ = newParameterList($1, $3) }
 								;
 
 ParameterDeclaration			:     IDENT COLON TypeExpression
+									{ $$ = newParameterDeclaration($1.position, $1.val, $3, false) }
 								| REF IDENT COLON TypeExpression
+									{ $$ = newParameterDeclaration($1.position, $2.val, $4, true) }
 								;
 
 VariableDeclarationList			:
+									{$$ = emptyVariableList()}
 								| VariableDeclaration VariableDeclarationList
+									{$$ = newVariableList($1, $2)}
 								;
 
 VariableDeclaration				: VAR IDENT COLON TypeExpression SEMIC
+									{$$ = newVariableDeclaration($1.position, $2.val, $4)}
 								;
 
 TypeExpression					: IDENT
+									{$$ = newNamedTypeExpression($1.postion, $1.val))}
 								| ARRAY LBRACK INTLIT RBRACK OF TypeExpression
+									{$$ = newArrayTypeExpression($1.postion, $6, $3))}
 								;
 
 
 StatementList					: 
+									{$$ = emptyStatementList()}
 								| NonEmptyStatementList
+									{$$ = $1}
 								;
 
 NonEmptyStatementList			: Statement
+									{$$ = newStatementList($1, emptyStatementList())}
 								| Statement NonEmptyStatementList
+									{$$ = newStatementList($1, $2)}
 								;
 
-Statement						: CallStatement
-								| CompoundStatement
-								| AssignStatement
-								| IfStatement
-								| WhileStatement
-								| EmptyStatement
+Statement						: CallStatement {$$ = $1}
+								| CompoundStatement {$$ = $1}
+								| AssignStatement {$$ = $1}
+								| IfStatement {$$ = $1}
+								| WhileStatement {$$ = $1}
+								| EmptyStatement {$$ = $1}
 								/* | DoWhileStatement */
 								;
 
