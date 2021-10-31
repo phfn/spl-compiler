@@ -215,10 +215,7 @@ ExpressionHigh					: MINUS ExpressionHigher
 
 /* Klammern oder intlit */
 ExpressionHigher				: LPAREN ExpressionLower RPAREN
-								| Value
-								;
-
-Value							: Variable
+								| Variable
 								| INTLIT
 								;
 
