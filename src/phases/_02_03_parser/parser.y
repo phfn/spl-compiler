@@ -58,37 +58,46 @@ void yyerror(Program**, char *);
 %token	<identVal>	IDENT
 %token	<intVal>	INTLIT
 
-/* %type	<globalDeclarationList>	GlobalDeclarationList; */
-/* %type	<globalDeclarationList>	NonEmptyGlobalDeclarationList; */
-/* %type	<globalDeclaration>		GlobalDeclaration; */
-/* %type	<globalDeclaration>		ProcDeclaration; */
-/* %type	<globalDeclaration>		TypeDeclaration; */
+%type	<globalDeclarationList>	GlobalDeclarationList;;
+%type	<globalDeclarationList>	NonEmptyGlobalDeclarationList
+%type	<globalDeclaration>		GlobalDeclaration
+%type	<globalDeclaration>		TypeDeclaration
+%type	<globalDeclaration>		ProcDeclaration
 
-/* %type	<typeExpression>		TypeExpression; */
+%type	<parameterList>			ParameterDeclarationList
+%type	<parameterList>			NonEmptyParameterDeclarationList
+%type	<parameterDeclaration>	ParameterDeclaration
 
-/* %type	<statementList>			StatementList; */
-/* %type	<statementList>			NonEmptyStatementList; */
-/* %type	<statement>				IfStatement; */
-/* %type	<statement>				WhileStatement; */
-/* %type	<statement>				AssignStatement; */
-/* %type	<statement>				CallStatement; */
-/* %type	<statement>				EmptyStatement; */
-/* %type	<statement>				CompoundStatement; */
+%type	<variableList>			VariableDeclarationList
+%type	<variableDeclaration>	VariableDeclaration
 
-/* %type	<parameterList>			ParameterDeclarationList; */
-/* %type	<parameterDeclaration>	ParameterDeclaration; */
+%type	<typeExpression>		TypeExpression
 
-/* %type	<variableList>			VariableDeclarationList; */
-/* %type	<variableDeclaration>	VariableDeclaration; */
+%type	<statementList>			StatementList
+%type	<statementList>			NonEmptyStatementList
 
-/* %type	<expressionList>		ExpressionList; */
-/* %type	<expression>			Expression; */
+%type	<statement>				Statement
+%type	<statement>				EmptyStatement
+%type	<statement>				CompoundStatement
+%type	<statement>				AssignStatement
+%type	<statement>				IfStatement
+%type	<statement>				WhileStatement
+%type	<statement>				CallStatement
 
+%type	<expressionList>		ExpressionList
+%type	<expressionList>		NonEmptyExpressionList
 
+%type	<expression>			Expression
+%type	<expression>			ExpressionLower
+%type	<expression>			ExpressionLow
+%type	<expression>			ExpressionMid
+%type	<expression>			ExpressionHigh
+%type	<expression>			ExpressionHigher
+
+%type	<variable>				Variable
 
 
 %start			program
-/* ** */
 
 %%
 
@@ -99,143 +108,175 @@ GlobalDeclarationList			: { $$ = emptyGlobalDeclarationList();}
 								| NonEmptyGlobalDeclarationList { $$ = $1;}
 								;
 
-NonEmptyGlobalDeclarationList	: GlobalDeclaration { $$ = newGlobalDeclarationList($1, EmptyGlobalDeclarationList());}
+NonEmptyGlobalDeclarationList	: GlobalDeclaration { $$ = newGlobalDeclarationList($1, emptyGlobalDeclarationList());}
 								| GlobalDeclaration NonEmptyGlobalDeclarationList { $$ = newGlobalDeclarationList($1, $2);}
 								;
 
-GlobalDeclaration				: ProcDeclaration //{$$=new GlobalDeclaration($1);}
-								| TypeDeclaration
+GlobalDeclaration				: ProcDeclaration {$$ = $1;}
+								| TypeDeclaration {$$ = $1;}
 								;
 
-TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC
+TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC {$$ = newTypeDeclaration($1.position, $2.val, $4);}
 								;
 
 ProcDeclaration					: PROC IDENT LPAREN ParameterDeclarationList RPAREN LCURL VariableDeclarationList StatementList RCURL
+									{ $$ = newProcedureDeclaration($1.position, $2.val, $4, $7, $8);}
 								;
 
-ParameterDeclarationList		: 
+ParameterDeclarationList		:
+									 {$$ = emptyParameterList();}
 								| NonEmptyParameterDeclarationList
+									{ $$ = $1;}
 								;
 
 NonEmptyParameterDeclarationList: ParameterDeclaration
+									{ $$ = newParameterList($1, emptyParameterList());}
 								| ParameterDeclaration COMMA NonEmptyParameterDeclarationList
+									{ $$ = newParameterList($1, $3) ;}
 								;
 
-ParameterDeclaration			:     IDENT COLON TypeExpression
+ParameterDeclaration			: IDENT COLON TypeExpression
+									{ $$ = newParameterDeclaration($1.position, $1.val, $3, false);}
 								| REF IDENT COLON TypeExpression
+									{ $$ = newParameterDeclaration($1.position, $2.val, $4, true);}
 								;
 
 VariableDeclarationList			:
+									{$$ = emptyVariableList();}
 								| VariableDeclaration VariableDeclarationList
+									{$$ = newVariableList($1, $2);}
 								;
 
 VariableDeclaration				: VAR IDENT COLON TypeExpression SEMIC
+									{$$ = newVariableDeclaration($1.position, $2.val, $4);}
 								;
 
 TypeExpression					: IDENT
+									{$$ = newNamedTypeExpression($1.position, $1.val);}
 								| ARRAY LBRACK INTLIT RBRACK OF TypeExpression
+									{$$ = newArrayTypeExpression($1.position, $6, $3.val);}
 								;
 
 
 StatementList					: 
+									{$$ = emptyStatementList();}
 								| NonEmptyStatementList
+									{$$ = $1;}
 								;
 
 NonEmptyStatementList			: Statement
+									{$$ = newStatementList($1, emptyStatementList());}
 								| Statement NonEmptyStatementList
+									{$$ = newStatementList($1, $2);}
 								;
 
-Statement						: CallStatement
-								| CompoundStatement
-								| AssignStatement
-								| IfStatement
-								| WhileStatement
-								| EmptyStatement
+Statement						: CallStatement {$$ = $1;}
+								| CompoundStatement {$$ = $1;}
+								| AssignStatement {$$ = $1;}
+								| IfStatement {$$ = $1;}
+								| WhileStatement {$$ = $1;}
+								| EmptyStatement {$$ = $1;}
 								/* | DoWhileStatement */
 								;
 
 EmptyStatement					: SEMIC
+									{ $$ = newEmptyStatement($1.position);}
 								;
 
 CompoundStatement				: LCURL StatementList RCURL
+									{$$ = newCompoundStatement($1.position, $2);}
 								;
 
 AssignStatement					: Variable ASGN Expression SEMIC
+									{$$ = newAssignStatement($1->position, $1, $3);}
 								;
 
-/* IfStatement						: IF LPAREN BoolExpression RPAREN Statement */
-/* 								| IF LPAREN BoolExpression RPAREN Statement ELSE Statement */
 IfStatement						: IF LPAREN Expression RPAREN Statement
+									{$$ = newIfStatement($1.position, $3, $5, newEmptyStatement($5->position));}
 								| IF LPAREN Expression RPAREN Statement ELSE Statement
+									{$$ = newIfStatement($1.position, $3, $5, $7);}
 								;
 
-/* WhileStatement					: WHILE LPAREN BoolExpression RPAREN Statement */
 WhileStatement					: WHILE LPAREN Expression RPAREN Statement
+									{$$ = newWhileStatement($1.position, $3, $5);}
 								;
 
-CallStatement					: IDENT LPAREN ParameterList RPAREN SEMIC
+CallStatement					: IDENT LPAREN ExpressionList RPAREN SEMIC
+									{ $$ = newCallStatement($1.position, $1.val, $3);}
 								;
 
-ParameterList					:
-								| NonEmptyParameterList
+ExpressionList					:
+									{ $$ = emptyExpressionList();}
+								| NonEmptyExpressionList
+									{ $$ = $1;}
 								;
 
-NonEmptyParameterList			: Expression
-								| Expression COMMA NonEmptyParameterList
+NonEmptyExpressionList			: Expression
+									{ $$ = newExpressionList($1, emptyExpressionList());}
+								| Expression COMMA NonEmptyExpressionList
+									{ $$ = newExpressionList($1, $3);}
 								;
 
-
-/* < + = */
-/* Expression						: INTLIT */
-/* 								| LPAREN Expression RPAREN */
-/* 								| Expression PLUS Expression */
-								/* ; */
 
 Expression						: ExpressionLower
+									{ $$ = $1;}
 								;
 
 // < > <= >= = #
-ExpressionLower					: ExpressionLower ComparisonOperator ExpressionLow
+ExpressionLower					: ExpressionLower LT ExpressionLow
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_LST, $1, $3);}
+								| ExpressionLower LE ExpressionLow
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_LSE, $1, $3);}
+								| ExpressionLower GT ExpressionLow
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_GRT, $1, $3);}
+								| ExpressionLower GE ExpressionLow
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_GRE, $1, $3);}
+								| ExpressionLower EQ ExpressionLow
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_EQU, $1, $3);}
+								| ExpressionLower NE ExpressionLow
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_NEQ, $1, $3);}
 								| ExpressionLow
+									{ $$ = $1;}
 								;
 
 // + -
-ExpressionLow					: ExpressionLow PlusMinusOperator ExpressionMid
+ExpressionLow					: ExpressionLow PLUS ExpressionMid
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_ADD, $1, $3);}
+								| ExpressionLow MINUS ExpressionMid
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_SUB, $1, $3);}
 								| ExpressionMid
+									{ $$ = $1;}
 								;
 
 // * /
-ExpressionMid					: ExpressionMid MulDivOperator ExpressionHigh
+ExpressionMid					: ExpressionMid STAR ExpressionHigh
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_MUL, $1, $3);}
+								| ExpressionMid SLASH ExpressionHigh
+									{ $$ = newBinaryExpression($1->position, ABSYN_OP_DIV, $1, $3);}
 								| ExpressionHigh
+									{ $$ = $1;}
 								;
 // -1
 ExpressionHigh					: MINUS ExpressionHigher
+									{ $$ = newBinaryExpression($1.position, ABSYN_OP_SUB, newIntLiteral($1.position, 0), $2);}
 								| ExpressionHigher
+									{ $$ = $1;}
 								;
 
 /* Klammern oder intlit */
 ExpressionHigher				: LPAREN ExpressionLower RPAREN
+									{ $$ = $2;}
 								| Variable
+									{ $$ = newVariableExpression($1->position, $1);}
 								| INTLIT
+									{ $$ = newIntLiteral($1.position, $1.val);}
 								;
 
 Variable						: IDENT
-								| IDENT Arrayzeugs
+									{ $$ = newNamedVariable($1.position, $1.val);}
+								| Variable LBRACK Expression RBRACK
+									{ $$ = newArrayAccess($1->position, $1, $3);}
 								;
-
-Arrayzeugs						: LBRACK Expression RBRACK
-								| Arrayzeugs LBRACK Expression RBRACK
-								;
-
-PlusMinusOperator				: PLUS
-								| MINUS
-								;
-
-MulDivOperator					: STAR
-								| SLASH
-								;
-
-ComparisonOperator				: LT | LE | GT | GE | EQ | NE ;
 
 %%
 
