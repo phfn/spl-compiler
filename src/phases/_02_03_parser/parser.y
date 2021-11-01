@@ -58,47 +58,46 @@ void yyerror(Program**, char *);
 %token	<identVal>	IDENT
 %token	<intVal>	INTLIT
 
-%type	<globalDeclarationList>	GlobalDeclarationList;
-%type	<globalDeclarationList>	NonEmptyGlobalDeclarationList;
-%type	<globalDeclaration>		GlobalDeclaration;
-%type	<globalDeclaration>		TypeDeclaration;
-%type	<globalDeclaration>		ProcDeclaration;
+%type	<globalDeclarationList>	GlobalDeclarationList;;
+%type	<globalDeclarationList>	NonEmptyGlobalDeclarationList
+%type	<globalDeclaration>		GlobalDeclaration
+%type	<globalDeclaration>		TypeDeclaration
+%type	<globalDeclaration>		ProcDeclaration
 
-%type	<parameterList>			ParameterDeclarationList;
-%type	<parameterList>			NonEmptyParameterDeclarationList;
-%type	<parameterDeclaration>	ParameterDeclaration;
+%type	<parameterList>			ParameterDeclarationList
+%type	<parameterList>			NonEmptyParameterDeclarationList
+%type	<parameterDeclaration>	ParameterDeclaration
 
-%type	<variableList>			VariableDeclarationList;
-%type	<variableDeclaration>	VariableDeclaration;
+%type	<variableList>			VariableDeclarationList
+%type	<variableDeclaration>	VariableDeclaration
 
-%type	<typeExpression>		TypeExpression;
+%type	<typeExpression>		TypeExpression
 
-%type	<statementList>			StatementList;
-%type	<statementList>			NonEmptyStatementList;
+%type	<statementList>			StatementList
+%type	<statementList>			NonEmptyStatementList
 
-%type	<statement>				Statement;
-%type	<statement>				EmptyStatement;
-%type	<statement>				CompoundStatement;
-%type	<statement>				AssignStatement;
-%type	<statement>				IfStatement;
-%type	<statement>				WhileStatement;
-%type	<statement>				CallStatement;
+%type	<statement>				Statement
+%type	<statement>				EmptyStatement
+%type	<statement>				CompoundStatement
+%type	<statement>				AssignStatement
+%type	<statement>				IfStatement
+%type	<statement>				WhileStatement
+%type	<statement>				CallStatement
 
-%type	<expressionList>		ExpressionList;
-%type	<expressionList>		NonEmptyExpressionList;
+%type	<expressionList>		ExpressionList
+%type	<expressionList>		NonEmptyExpressionList
 
-%type	<expression>			Expression;
-%type	<expression>			ExpressionLower;
-%type	<expression>			ExpressionLow;
-%type	<expression>			ExpressionMid;
-%type	<expression>			ExpressionHigh;
-%type	<expression>			ExpressionHigher;
+%type	<expression>			Expression
+%type	<expression>			ExpressionLower
+%type	<expression>			ExpressionLow
+%type	<expression>			ExpressionMid
+%type	<expression>			ExpressionHigh
+%type	<expression>			ExpressionHigher
 
-%type	<variable>				Variable;
+%type	<variable>				Variable
 
 
 %start			program
-/* ** */
 
 %%
 
@@ -117,7 +116,7 @@ GlobalDeclaration				: ProcDeclaration {$$ = $1;}
 								| TypeDeclaration {$$ = $1;}
 								;
 
-TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC {newTypeDeclaration($1.position, $2.val, $4);}
+TypeDeclaration					: TYPE IDENT EQ TypeExpression SEMIC {$$ = newTypeDeclaration($1.position, $2.val, $4);}
 								;
 
 ProcDeclaration					: PROC IDENT LPAREN ParameterDeclarationList RPAREN LCURL VariableDeclarationList StatementList RCURL
