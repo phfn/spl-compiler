@@ -32,14 +32,18 @@ Type* createTypeForTypeExpression(TypeExpression* e, SymbolTable* table, Positio
             Identifier *identifier = e->u.namedTypeExpression.name;
 
             // gibt es den Typ überhaupt?
-            if (lookup(table, identifier) == NULL) {
-                notAType(pos, identifier);
+            Entry *lookedUpEntry = lookup(table, identifier);
+            if ( lookedUpEntry == NULL) {
+                undefinedType(pos, identifier);// wenn als typ ein nicht existierender typ angegeben wurde
+            }
+            if(lookedUpEntry->kind != ENTRY_KIND_TYPE) {
+                notAType(pos, identifier);//wenn als typ ein prozedurname angegeben wurde
             }
 
             return newPrimitiveType(identifier->string, INT_BYTE_SIZE);//TODO: check if this is correct
             break;
         case TYPEEXPRESSION_ARRAYTYPEEXPRESSION:
-            return newArrayType(e->u.arrayTypeExpression.arraySize, createTypeForTypeExpression(e->u.arrayTypeExpression.baseType));
+            return newArrayType(e->u.arrayTypeExpression.arraySize, createTypeForTypeExpression(e->u.arrayTypeExpression.baseType, table, pos));
             break;
     }
 }
@@ -53,6 +57,24 @@ ParameterTypeList* createParameterTypeList(ParameterDeclarationList* pdl, Symbol
         Type *type = createTypeForTypeExpression(current->typeExpression, table, pos);
         ptl = newParameterTypeList(type, ptl);
     }
+}
+
+SymbolTable* createProcedureSymbolTable(VariableDeclarationList* variables, SymbolTable* upperLevel, Position pos){
+    SymbolTable* table = newTable(upperLevel);
+
+    //alle parameter erzeugen
+
+    //alle variablen
+    while(!variables->isEmpty){
+        VariableDeclaration *current = variables->head;
+        variables = variables->tail;
+        Type* type = current->typeExpression->dataType;
+        //error checks
+        Entry* entry = newVarEntry(type, false);
+
+        enter(table, current->name, entry);
+
+    return table;
 }
 
 SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables) {
@@ -79,13 +101,21 @@ SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables) {
                 //new Entry for the procedure declaration
                 ;
                 ParameterTypeList *parameterTypeList = createParameterTypeList(current->u.procedureDeclaration.parameters, globalTable, current->position);
-                Entry *proc_entry = enter(globalTable, current->name, newProcEntry(parameterTypeList, newTable(globalTable)));
+                VariableDeclarationList* variables = current->u.procedureDeclaration.variables;
+                //StatementList* body = current->u.procedureDeclaration.body;
+                SymbolTable *procedureTable = createProcedureSymbolTable(variables, globalTable);
+                Entry *proc_entry = enter(globalTable, current->name, newProcEntry(parameterTypeList, procedureTable)); 
                 if(proc_entry == NULL) {
                     redeclarationAsProcedure(current->position, current->name);
                 }
+                //for every procedure declaration, create a local symbol table
                 break;
 
         }
+        
+        
+        
+        
         // type x = intType;
         // type x = intType
 
