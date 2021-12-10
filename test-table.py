@@ -19,8 +19,8 @@ spl_ref = "./eco32tools/bin/refspl"
 spl_our = "./build/spl"
 
 for file in files:
-    our = run([spl_our, "--parse", file], capture_output=True, check=False)
-    ref = run([spl_ref, "--parse", file], capture_output=True, check=False)
+    our = run([spl_our, "--tables", file], capture_output=True, check=False)
+    ref = run([spl_ref, "--tables", file], capture_output=True, check=False)
     if our.stdout == ref.stdout:
         print(f"{file} ✓")
     else:
