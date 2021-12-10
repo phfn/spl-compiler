@@ -37,11 +37,11 @@ Type* createTypeForTypeExpression(TypeExpression* e, SymbolTable* table, Positio
                 undefinedType(pos, identifier);// wenn als typ ein nicht existierender typ angegeben wurde
             }
             if(lookedUpEntry->kind != ENTRY_KIND_TYPE) {
-                notAType(pos, identifier);//wenn als typ ein prozedurname angegeben wurde
+                notAType(pos, identifier); //wenn als typ ein prozedurname angegeben wurde
             }
-
-            return newPrimitiveType(identifier->string, INT_BYTE_SIZE);//TODO: check if this is correct
+            return lookedUpEntry->u.typeEntry.type;
             break;
+
         case TYPEEXPRESSION_ARRAYTYPEEXPRESSION:
             return newArrayType(e->u.arrayTypeExpression.arraySize, createTypeForTypeExpression(e->u.arrayTypeExpression.baseType, table, pos));
             break;
@@ -54,25 +54,49 @@ ParameterTypeList* createParameterTypeList(ParameterDeclarationList* pdl, Symbol
         //new parameter type
         ParameterDeclaration *current = pdl->head;
         pdl = pdl->tail;
+        //type penis = array[21] of int
+        //fun iwas(a: int, ref b: penis){}
+        //a: int
+        // b: array....
+        if(current->typeExpression->kind == TYPEEXPRESSION_ARRAYTYPEEXPRESSION && !current->isReference){
+            mustBeAReferenceParameter(pos, current->name);
+        }
         Type *type = createTypeForTypeExpression(current->typeExpression, table, pos);
-        ptl = newParameterTypeList(type, ptl);
+        ParameterType *parameterType = newParameterType(type, current->isReference);
+//        current->typeExpression->dataType = type;
+        ptl = newParameterTypeList(parameterType, ptl);
     }
+    return ptl;
 }
 
-SymbolTable* createProcedureSymbolTable(VariableDeclarationList* variables, SymbolTable* upperLevel, Position pos){
+SymbolTable* createProcedureSymbolTable(ParameterDeclarationList* parameters, VariableDeclarationList* variables, SymbolTable* upperLevel, Position pos){
     SymbolTable* table = newTable(upperLevel);
+    printf("");
 
     //alle parameter erzeugen
+    while(!parameters->isEmpty) {
+        ParameterDeclaration * current = parameters->head;
+        parameters = parameters->tail;
+        //error checks
+        Identifier* name = current->name; //TODO is das richtig
+        Type *type = createTypeForTypeExpression(current->typeExpression, table, pos);
+        Entry* entry = newVarEntry(type, current->isReference);
+        enter(table, name, entry);
+
+
+    }
 
     //alle variablen
-    while(!variables->isEmpty){
-        VariableDeclaration *current = variables->head;
+    while(!variables->isEmpty) {
+        VariableDeclaration* current = variables->head;
         variables = variables->tail;
-        Type* type = current->typeExpression->dataType;
+        Type *type = current->typeExpression->dataType;
         //error checks
-        Entry* entry = newVarEntry(type, false);
+        Entry *entry = newVarEntry(type, false);
 
         enter(table, current->name, entry);
+    }
+
 
     return table;
 }
@@ -100,11 +124,13 @@ SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables) {
             case DECLARATION_PROCEDUREDECLARATION:
                 //new Entry for the procedure declaration
                 ;
-                ParameterTypeList *parameterTypeList = createParameterTypeList(current->u.procedureDeclaration.parameters, globalTable, current->position);
+                ParameterTypeList* parameterTypeList = createParameterTypeList(current->u.procedureDeclaration.parameters, globalTable, current->position);
+                ParameterDeclarationList* parameters = current->u.procedureDeclaration.parameters;
                 VariableDeclarationList* variables = current->u.procedureDeclaration.variables;
                 //StatementList* body = current->u.procedureDeclaration.body;
-                SymbolTable *procedureTable = createProcedureSymbolTable(variables, globalTable);
-                Entry *proc_entry = enter(globalTable, current->name, newProcEntry(parameterTypeList, procedureTable)); 
+                SymbolTable *procedureTable = createProcedureSymbolTable(parameters, variables, globalTable, current->position);
+                Entry *proc_entry = enter(globalTable, current->name, newProcEntry(parameterTypeList, procedureTable));
+                printSymbolTableAtEndOfProcedure(current->name, proc_entry);
                 if(proc_entry == NULL) {
                     redeclarationAsProcedure(current->position, current->name);
                 }
@@ -126,5 +152,5 @@ SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables) {
     }
 
     //TODO (assignment 4a): Initialize a symbol table with all predefined symbols and fill it with user-defined symbols
-    notImplemented();
+//    notImplemented();
 }
