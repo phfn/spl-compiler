@@ -1,0 +1,575 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-c",
+      "CMakeCCompilerId.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/3.21.4/CompilerIdC",
+    "file": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/3.21.4/CompilerIdC/CMakeCCompilerId.c"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-v",
+      "-c",
+      "-o",
+      "CMakeFiles/cmTC_400ed.dir/CMakeCCompilerABI.c.o",
+      "/usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/CMakeTmp",
+    "file": "/usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_400ed.dir/CMakeCCompilerABI.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/generated-sources/phases/_02_03_parser/parser.c.o",
+      "/home/phfn/workspace/spl-compiler/build/generated-sources/phases/_02_03_parser/parser.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/build/generated-sources/phases/_02_03_parser/parser.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/generated-sources/phases/_02_03_parser/parser.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/generated-sources/phases/_01_scanner/scanner.c.o",
+      "/home/phfn/workspace/spl-compiler/build/generated-sources/phases/_01_scanner/scanner.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/build/generated-sources/phases/_01_scanner/scanner.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/generated-sources/phases/_01_scanner/scanner.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/expressions.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/expressions.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/expressions.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/expressions.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/global_declarations.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/global_declarations.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/global_declarations.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/global_declarations.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/lists.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/lists.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/lists.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/lists.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/parameter_declaration.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/parameter_declaration.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/parameter_declaration.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/parameter_declaration.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/position.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/position.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/position.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/position.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/program.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/program.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/program.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/program.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/statements.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/statements.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/statements.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/statements.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/type_expressions.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/type_expressions.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/type_expressions.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/type_expressions.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/variable_declaration.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/variable_declaration.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/variable_declaration.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/variable_declaration.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/variables.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/variables.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/variables.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/variables.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/absyn/printing/printing_helpers.c.o",
+      "/home/phfn/workspace/spl-compiler/src/absyn/printing/printing_helpers.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/absyn/printing/printing_helpers.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/absyn/printing/printing_helpers.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/phases/_04a_tablebuild/tablebuild.c.o",
+      "/home/phfn/workspace/spl-compiler/src/phases/_04a_tablebuild/tablebuild.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/phases/_04a_tablebuild/tablebuild.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/phases/_04a_tablebuild/tablebuild.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/phases/_04b_semant/procedurebodycheck.c.o",
+      "/home/phfn/workspace/spl-compiler/src/phases/_04b_semant/procedurebodycheck.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/phases/_04b_semant/procedurebodycheck.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/phases/_04b_semant/procedurebodycheck.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/phases/_05_varalloc/varalloc.c.o",
+      "/home/phfn/workspace/spl-compiler/src/phases/_05_varalloc/varalloc.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/phases/_05_varalloc/varalloc.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/phases/_05_varalloc/varalloc.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/phases/_05_varalloc/stack_layout.c.o",
+      "/home/phfn/workspace/spl-compiler/src/phases/_05_varalloc/stack_layout.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/phases/_05_varalloc/stack_layout.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/phases/_05_varalloc/stack_layout.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/phases/_06_codegen/codegen.c.o",
+      "/home/phfn/workspace/spl-compiler/src/phases/_06_codegen/codegen.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/phases/_06_codegen/codegen.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/phases/_06_codegen/codegen.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/phases/_06_codegen/codeprint.c.o",
+      "/home/phfn/workspace/spl-compiler/src/phases/_06_codegen/codeprint.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/phases/_06_codegen/codeprint.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/phases/_06_codegen/codeprint.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/main.c.o",
+      "/home/phfn/workspace/spl-compiler/src/main.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/main.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/main.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/command_line_options.c.o",
+      "/home/phfn/workspace/spl-compiler/src/command_line_options.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/command_line_options.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/command_line_options.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/table/identifier.c.o",
+      "/home/phfn/workspace/spl-compiler/src/table/identifier.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/table/identifier.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/table/identifier.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/table/table.c.o",
+      "/home/phfn/workspace/spl-compiler/src/table/table.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/table/table.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/table/table.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/table/entry.c.o",
+      "/home/phfn/workspace/spl-compiler/src/table/entry.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/table/entry.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/table/entry.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/types/types.c.o",
+      "/home/phfn/workspace/spl-compiler/src/types/types.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/types/types.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/types/types.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/util/errors.c.o",
+      "/home/phfn/workspace/spl-compiler/src/util/errors.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/util/errors.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/util/errors.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/util/memory.c.o",
+      "/home/phfn/workspace/spl-compiler/src/util/memory.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/util/memory.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/util/memory.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/util/ascii_table.c.o",
+      "/home/phfn/workspace/spl-compiler/src/util/ascii_table.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/util/ascii_table.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/util/ascii_table.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/phfn/workspace/spl-compiler/src",
+      "-I/home/phfn/workspace/spl-compiler/build/generated-sources",
+      "-I/home/phfn/workspace/spl-compiler",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-std=gnu11",
+      "-c",
+      "-o",
+      "CMakeFiles/spl.dir/src/util/string_ops.c.o",
+      "/home/phfn/workspace/spl-compiler/src/util/string_ops.c"
+    ],
+    "directory": "/home/phfn/workspace/spl-compiler/build",
+    "file": "/home/phfn/workspace/spl-compiler/src/util/string_ops.c",
+    "output": "/home/phfn/workspace/spl-compiler/build/CMakeFiles/spl.dir/src/util/string_ops.c.o"
+  }
+]
