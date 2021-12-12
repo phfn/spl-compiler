@@ -13,6 +13,8 @@
 #define BOOL_BYTE_SIZE   4    /* size of a bool in bytes */
 #define INT_BYTE_SIZE    4    /* size of an int in bytes */
 
+
+
 /**
  * Prints the local symbol table of a procedure together with a heading-line
  * NOTE: You have to call this after completing the local table to support '--tables'.
@@ -24,6 +26,7 @@ static void printSymbolTableAtEndOfProcedure(Identifier *name, Entry *procedureE
     showTable(procedureEntry->u.procEntry.localTable);
     printf("\n");
 }
+
 
 Type* createTypeForTypeExpression(TypeExpression* e, SymbolTable* table, Position pos) {
     switch (e->kind) {
@@ -47,9 +50,19 @@ Type* createTypeForTypeExpression(TypeExpression* e, SymbolTable* table, Positio
             break;
     }
 }
+ParameterTypeList* push(ParameterTypeList* list, ParameterType* el){
+    ParameterTypeList* current = list;
+    while(!current->isEmpty){
+		current = current->tail;
+    }
+    current->isEmpty = false;
+    current->tail = newParameterTypeList(el, emptyParameterTypeList());
+	return list;
+}
 
 ParameterTypeList* createParameterTypeList(ParameterDeclarationList* pdl, SymbolTable* table, Position pos) {
     ParameterTypeList * ptl = emptyParameterTypeList();
+    ParameterTypeList* last_item = ptl;
     while(!pdl->isEmpty){
         //new parameter type
         ParameterDeclaration *current = pdl->head;
@@ -63,8 +76,17 @@ ParameterTypeList* createParameterTypeList(ParameterDeclarationList* pdl, Symbol
         }
         Type *type = createTypeForTypeExpression(current->typeExpression, table, pos);
         ParameterType *parameterType = newParameterType(type, current->isReference);
-//        current->typeExpression->dataType = type;
-        ptl = newParameterTypeList(parameterType, ptl);
+
+		//Elemt ganz hinten anfügen
+		if(last_item->isEmpty){
+            last_item->head = parameterType;
+            last_item->tail = emptyParameterTypeList();
+            last_item->isEmpty = false;
+		}else{
+            last_item->tail = newParameterTypeList(parameterType, emptyParameterTypeList());
+            last_item->isEmpty = false;
+            last_item = last_item->tail;
+		}
     }
     return ptl;
 }
