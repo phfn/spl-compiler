@@ -90,7 +90,7 @@ SymbolTable* createProcedureSymbolTable(ParameterDeclarationList* parameters, Va
     while(!variables->isEmpty) {
         VariableDeclaration* current = variables->head;
         variables = variables->tail;
-        Type *type = current->typeExpression->dataType;
+        Type *type = createTypeForTypeExpression(current->typeExpression, table, pos);
         //error checks
         Entry *entry = newVarEntry(type, false);
 
