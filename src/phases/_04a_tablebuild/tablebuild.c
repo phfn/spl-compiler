@@ -101,6 +101,7 @@ SymbolTable *createProcedureSymbolTable(ParameterDeclarationList *parameters, Va
         Entry *entry = newVarEntry(type, false);
 
         enter(local_table, name, entry);
+        //TODO nach errors gucken siehe vl folie 15 seite 5
     }
 
     return local_table;
