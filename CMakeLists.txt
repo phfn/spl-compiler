@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_BUILD_TYPE Debug)
 add_compile_options(-Wall -Wextra)
 
+# set(CMAKE_EXPORT_COMPILE_COMMANDS)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated-sources/phases/_01_scanner)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated-sources/phases/_02_03_parser)
 
@@ -45,6 +46,7 @@ add_executable(
         src/absyn/variables.c
         src/absyn/printing/printing_helpers.c
         src/phases/_04a_tablebuild/tablebuild.c
+        src/phases/_04a_tablebuild/createtype.c
         src/phases/_04b_semant/procedurebodycheck.c
         src/phases/_05_varalloc/varalloc.c
         src/phases/_05_varalloc/stack_layout.c

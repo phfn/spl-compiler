@@ -20,4 +20,6 @@
  */
 SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables);
 
+Type *createTypeForTypeExpression(TypeExpression *e, SymbolTable *table, Position pos);
+
 #endif //_TABLEBUILD_H
