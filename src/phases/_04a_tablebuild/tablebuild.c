@@ -172,5 +172,14 @@ SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables) {
         }
     }
 
+    // main procedure must exist and must not have parameters
+    Entry* mainProcedure = lookup(globalTable, newIdentifier("main"));
+    if (mainProcedure == NULL)
+        mainIsMissing();
+    else if (mainProcedure->kind != ENTRY_KIND_PROC)
+        mainIsNotAProcedure();
+    else if (!mainProcedure->u.procEntry.parameterTypes->isEmpty)
+        mainMustNotHaveParameters();
+
     return globalTable;
 }
