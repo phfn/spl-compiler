@@ -176,9 +176,9 @@ SymbolTable *buildSymbolTable(Program *program, bool showSymbolTables) {
     Entry* mainProcedure = lookup(globalTable, newIdentifier("main"));
     if (mainProcedure == NULL)
         mainIsMissing();
-    else if (mainProcedure->kind != ENTRY_KIND_PROC)
+    if (mainProcedure->kind != ENTRY_KIND_PROC)
         mainIsNotAProcedure();
-    else if (!mainProcedure->u.procEntry.parameterTypes->isEmpty)
+    if (!mainProcedure->u.procEntry.parameterTypes->isEmpty)
         mainMustNotHaveParameters();
 
     return globalTable;
