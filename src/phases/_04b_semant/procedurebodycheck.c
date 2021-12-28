@@ -20,6 +20,7 @@
 // var c: int;
 // c := b[4];
 // }
+Type *getTypeOfExpression( Expression *exp, SymbolTable *local_table );
 
 void checkVariables(
 		VariableDeclarationList *variables,
@@ -48,7 +49,20 @@ Type *getTypeOfVariable(
     switch (variable->kind) {
         case VARIABLE_ARRAYACCESS:
             //rekursiv den typ der variable ermitteln
-            return getTypeOfVariable(variable->u.arrayAccess.array, localTable);
+            ;
+            Type *type_von_unserm_array_das_wir_accessen = getTypeOfVariable(variable->u.arrayAccess.array, localTable);
+//            when type_von_unserm_array_das_wir_accessen primitiv is haetten wir ja keinen array access drauf machen duerfen
+            switch (type_von_unserm_array_das_wir_accessen->kind){
+                case TYPE_KIND_PRIMITIVE:
+                    indexingNonArray(variable->position);
+                    break;
+                case TYPE_KIND_ARRAY:
+                    if(getTypeOfExpression(variable->u.arrayAccess.index, localTable) != intType){
+                        indexingWithNonInteger(variable->position);
+                    }
+                    variable->dataType = type_von_unserm_array_das_wir_accessen->u.arrayType.baseType;
+                    return variable->dataType;
+            }
         case VARIABLE_NAMEDVARIABLE:
             ;
             //variable muss in symvoltable sein und eine variable sein
@@ -60,15 +74,62 @@ Type *getTypeOfVariable(
             if(lookedUp->kind != ENTRY_KIND_VAR){
                 notAVariable(variable->position, name);
             }
-            Type *t = lookedUp->u.varEntry.type;
-            return t;
+            variable->dataType = lookedUp->u.varEntry.type;
+            return variable->dataType;
     }
+}
+Type *getTypeOfBinaryExpression(Expression *exp, SymbolTable *local_table){
+    Expression *left = exp->u.binaryExpression.leftOperand;
+    Expression *right = exp->u.binaryExpression.rightOperand;
+    BinaryOperator operator = exp->u.binaryExpression.operator;
+
+    left->dataType = getTypeOfExpression(left, local_table);
+    right->dataType = getTypeOfExpression(right, local_table);
+    if (left->dataType != right->dataType) {
+        operatorDifferentTypes(exp->position);
+    }
+
+    switch (operator) {
+        case ABSYN_OP_ADD:
+        case ABSYN_OP_SUB:
+        case ABSYN_OP_MUL:
+        case ABSYN_OP_DIV:
+            if (left->dataType->kind != TYPE_KIND_PRIMITIVE ||
+                right->dataType->kind != TYPE_KIND_PRIMITIVE) {
+                arithmeticOperatorNonInteger(exp->position);
+            }
+            exp->dataType = intType;
+            break;
+        case ABSYN_OP_EQU:
+        case ABSYN_OP_NEQ:
+        case ABSYN_OP_GRE:
+        case ABSYN_OP_GRT:
+        case ABSYN_OP_LSE:
+        case ABSYN_OP_LST:
+            if (left->dataType->kind != TYPE_KIND_PRIMITIVE ||
+                right->dataType->kind != TYPE_KIND_PRIMITIVE) {
+                comparisonNonInteger(exp->position);
+            }
+            exp->dataType = boolType;
+            break;
+        default:
+            break;
+    }
+    return exp->dataType;
+}
+
+Type *getTypeOfVariableExpression(Expression *exp, SymbolTable *local_table){
+
+    Variable *variable = exp->u.variableExpression.variable;
+
+    variable->dataType = getTypeOfVariable(variable, local_table);
+    return exp->u.variableExpression.variable->dataType;
 }
 
 Type *getTypeOfExpression(
         Expression *exp,
         SymbolTable *local_table
-        ) {
+) {
     switch (exp->kind) {
         // 5
         case EXPRESSION_INTLITERAL:
@@ -76,51 +137,11 @@ Type *getTypeOfExpression(
 
             // a
         case EXPRESSION_VARIABLEEXPRESSION:
-            ;
-            Variable *variable = exp->u.variableExpression.variable;
-
-            variable->dataType = getTypeOfVariable(variable, local_table);
-            //TODO error checks
-            //vermutlich diese
-//            void indexingNonArray(Position position);
-//            void indexingWithNonInteger(Position position);
-
-            return exp->u.variableExpression.variable->dataType;
+            return getTypeOfVariableExpression(exp, local_table);
 
             //3 + 5
         case EXPRESSION_BINARYEXPRESSION:
-            ;
-            Expression *left = exp->u.binaryExpression.leftOperand;
-            Expression *right = exp->u.binaryExpression.rightOperand;
-            BinaryOperator operator = exp->u.binaryExpression.operator;
-
-            left->dataType = getTypeOfExpression(left, local_table);
-            right->dataType = getTypeOfExpression(right, local_table);
-            if (left->dataType != right->dataType) {
-                operatorDifferentTypes(exp->position);
-            }
-
-            if (left->dataType->kind != TYPE_KIND_PRIMITIVE ||
-                right->dataType->kind != TYPE_KIND_PRIMITIVE) {
-                switch (operator) {
-                    case ABSYN_OP_ADD:
-                    case ABSYN_OP_SUB:
-                    case ABSYN_OP_MUL:
-                    case ABSYN_OP_DIV:
-                        arithmeticOperatorNonInteger(exp->position);
-                        break;
-                    case ABSYN_OP_EQU:
-                    case ABSYN_OP_NEQ:
-                    case ABSYN_OP_GRE:
-                    case ABSYN_OP_GRT:
-                    case ABSYN_OP_LSE:
-                    case ABSYN_OP_LST:
-                        comparisonNonInteger(exp->position);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            return getTypeOfBinaryExpression(exp, local_table);
             break;
     }
 }
@@ -131,7 +152,6 @@ void checkStatement(
     ){
     switch(statement->kind){
         case STATEMENT_ASSIGNSTATEMENT:
-            // TODO dataType is noch NULL
             ;
 
             Variable *target = statement->u.assignStatement.target;
@@ -162,6 +182,7 @@ void checkStatement(
         case STATEMENT_EMPTYSTATEMENT:
             break;
         case STATEMENT_IFSTATEMENT:
+//            steht iwie gleich oder kleiner oder so
             break;
         case STATEMENT_WHILESTATEMENT:
             break;
