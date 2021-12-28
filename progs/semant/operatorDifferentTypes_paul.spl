@@ -1,0 +1,7 @@
+proc main(){
+var a : int;
+var b : array[1] of int;
+
+a := 3 + b;
+}
+

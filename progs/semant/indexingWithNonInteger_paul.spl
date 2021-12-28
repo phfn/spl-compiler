@@ -1,0 +1,5 @@
+proc main(){
+	var a : array[1] of int;
+	a[a] := 5;
+}
+

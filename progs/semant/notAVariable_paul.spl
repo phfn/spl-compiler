@@ -1,0 +1,5 @@
+proc notAVar(){}
+
+proc main(){
+	notAVar := 5;
+}
