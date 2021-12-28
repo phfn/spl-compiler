@@ -21,7 +21,7 @@ spl_our = "./build/spl"
 for file in files:
     our = run([spl_our, "--semant", file], capture_output=True, check=False)
     ref = run([spl_ref, "--semant", file], capture_output=True, check=False)
-    if our.stdout == ref.stdout:
+    if our.returncode == ref.returncode:
         print(f"{file} ✓")
     else:
         print(f"{file} ✕")
