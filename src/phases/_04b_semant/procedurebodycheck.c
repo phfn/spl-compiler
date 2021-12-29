@@ -123,6 +123,47 @@ Type *getTypeOfExpression(
     }
 }
 
+void checkArguments(Statement *call_statement, Entry *procedure){
+    ExpressionList *arguments = call_statement->u.callStatement.arguments;
+    Identifier *proc_name = call_statement->u.callStatement.procedureName;
+    SymbolTable *local_table = procedure->u.procEntry.localTable;
+    ParameterTypeList *parameter_types = procedure->u.procEntry.parameterTypes;
+
+    Expression *current_argument;
+    ParameterType *current_parameter_type;
+    int index = 0;
+    while(!arguments->isEmpty){
+        current_argument = arguments->head;
+        arguments = arguments->tail;
+        if(parameter_types->isEmpty){// wenn's keine prozedurtypen aber noch argumente gibt, wurden zu wenig uebergebnen
+            tooManyArguments(current_argument->position, proc_name);
+        }
+        current_parameter_type = parameter_types->head;
+        parameter_types = parameter_types->tail;
+
+        current_argument->dataType = getTypeOfExpression(current_argument, local_table);
+        if(current_argument->dataType != current_parameter_type->type){
+            argumentTypeMismatch(current_argument->position, proc_name, index);
+        }
+        if(current_parameter_type->isRef && current_argument->kind!=ENTRY_KIND_VAR){
+            argumentMustBeAVariable(current_argument->position, proc_name, index);
+        }
+        index = index + 1;
+    }
+
+    //wenn der durch alle argumente durch is, aber noch parametertypen uebrig, gibt es zu wenig argumente
+//    arguments =   [ 1 ,  2 ,  3 ] -> []
+//    parametertypes[int, int, int, int] -> [int]
+    if (!parameter_types->isEmpty){
+        tooFewArguments(arguments->head->position, proc_name);
+
+    }
+
+
+
+
+
+}
 void checkStatement(
         Statement* statement,
         SymbolTable* localTable
@@ -152,6 +193,17 @@ void checkStatement(
 
             break;
         case STATEMENT_CALLSTATEMENT:
+            ;
+            Identifier *proc_name = statement->u.callStatement.procedureName;
+            Entry *looked_up = lookup(localTable, proc_name);
+            if (looked_up == NULL){
+                undefinedProcedure(statement->position, proc_name);
+            }
+            if (looked_up->kind != ENTRY_KIND_PROC){
+                callOfNonProcedure(statement->position, proc_name);
+            }
+            checkArguments(statement, looked_up);
+
             break;
         case STATEMENT_COMPOUNDSTATEMENT:
             break;
