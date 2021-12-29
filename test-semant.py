@@ -13,7 +13,7 @@ def get_files(folder: str) -> list:
     return files
 
 
-files = [file for file in get_files("progs/semant") if ".spl" in str(file)]
+files = [file for file in get_files("progs") if ".spl" in str(file)]
 files.sort()
 spl_ref = "./eco32tools/bin/refspl"
 spl_our = "./build/spl"
