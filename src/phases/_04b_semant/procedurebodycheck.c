@@ -9,8 +9,10 @@
 #include "absyn/statements.h"
 #include "phases/_04a_tablebuild/tablebuild.h"
 #include "table/entry.h"
+#include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/stat.h>
 #include <util/errors.h>
 #include <absyn/absyn.h>
 #include <types/types.h>
@@ -71,8 +73,8 @@ Type *getTypeOfBinaryExpression(Expression *exp, SymbolTable *local_table){
         case ABSYN_OP_SUB:
         case ABSYN_OP_MUL:
         case ABSYN_OP_DIV:
-            if (left->dataType->kind != TYPE_KIND_PRIMITIVE ||
-                right->dataType->kind != TYPE_KIND_PRIMITIVE) {
+            if (left->dataType != intType ||
+                right->dataType != intType) {
                 arithmeticOperatorNonInteger(exp->position);
             }
             exp->dataType = intType;
@@ -83,8 +85,8 @@ Type *getTypeOfBinaryExpression(Expression *exp, SymbolTable *local_table){
         case ABSYN_OP_GRT:
         case ABSYN_OP_LSE:
         case ABSYN_OP_LST:
-            if (left->dataType->kind != TYPE_KIND_PRIMITIVE ||
-                right->dataType->kind != TYPE_KIND_PRIMITIVE) {
+            if (left->dataType != intType ||
+                right->dataType != intType) {
                 comparisonNonInteger(exp->position);
             }
             exp->dataType = boolType;
@@ -123,10 +125,9 @@ Type *getTypeOfExpression(
     }
 }
 
-void checkArguments(Statement *call_statement, Entry *procedure){
+void checkArguments(Statement *call_statement, Entry *procedure, SymbolTable *local_table){
     ExpressionList *arguments = call_statement->u.callStatement.arguments;
     Identifier *proc_name = call_statement->u.callStatement.procedureName;
-    SymbolTable *local_table = procedure->u.procEntry.localTable;
     ParameterTypeList *parameter_types = procedure->u.procEntry.parameterTypes;
 
     Expression *current_argument;
@@ -145,7 +146,7 @@ void checkArguments(Statement *call_statement, Entry *procedure){
         if(current_argument->dataType != current_parameter_type->type){
             argumentTypeMismatch(current_argument->position, proc_name, index);
         }
-        if(current_parameter_type->isRef && current_argument->kind!=ENTRY_KIND_VAR){
+        if(current_parameter_type->isRef && current_argument->kind!=EXPRESSION_VARIABLEEXPRESSION){
             argumentMustBeAVariable(current_argument->position, proc_name, index);
         }
         index = index + 1;
@@ -166,7 +167,7 @@ void checkArguments(Statement *call_statement, Entry *procedure){
 }
 void checkStatement(
         Statement* statement,
-        SymbolTable* localTable
+        SymbolTable* local_table
     ){
     switch(statement->kind){
         case STATEMENT_ASSIGNSTATEMENT:
@@ -177,10 +178,10 @@ void checkStatement(
 
             //variable muss in symvoltable sein und eine variable sein
             //rekursiv den typ der variable ermitteln
-            target->dataType = getTypeOfVariable(target, localTable);
+            target->dataType = getTypeOfVariable(target, local_table);
 
 //            statement->u.assignStatement.value->dataType = getTypeOfExpression(statement->u.assignStatement.value, localTable);
-            value->dataType = getTypeOfExpression(value, localTable);
+            value->dataType = getTypeOfExpression(value, local_table);
 
 
             //prüfen dass links und rechts typkompatible sind
@@ -195,23 +196,48 @@ void checkStatement(
         case STATEMENT_CALLSTATEMENT:
             ;
             Identifier *proc_name = statement->u.callStatement.procedureName;
-            Entry *looked_up = lookup(localTable, proc_name);
+            Entry *looked_up = lookup(local_table, proc_name);
             if (looked_up == NULL){
                 undefinedProcedure(statement->position, proc_name);
             }
             if (looked_up->kind != ENTRY_KIND_PROC){
                 callOfNonProcedure(statement->position, proc_name);
             }
-            checkArguments(statement, looked_up);
+            checkArguments(statement, looked_up, local_table);
 
             break;
         case STATEMENT_COMPOUNDSTATEMENT:
-            break;
-        case STATEMENT_EMPTYSTATEMENT:
+			;
+			StatementList *statements = statement->u.compoundStatement.statements;
+			Statement *current;
+			while(!statements->isEmpty){
+				current = statements->head;
+				statements = statements->tail;
+				checkStatement(current, local_table);
+			}
             break;
         case STATEMENT_IFSTATEMENT:
+			;
+			Expression *if_condition = statement->u.ifStatement.condition;
+			Type *if_type = getTypeOfExpression(if_condition, local_table);
+			if (if_type != boolType){
+				ifConditionMustBeBoolean(statement->position);
+			}
+			checkStatement(statement->u.ifStatement.thenPart, local_table);
+			checkStatement(statement->u.ifStatement.elsePart, local_table);
             break;
         case STATEMENT_WHILESTATEMENT:
+			;
+			Expression *while_condition = statement->u.whileStatement.condition;
+			Type *while_type = getTypeOfExpression(while_condition, local_table);
+			if (while_type != boolType){
+				whileConditionMustBeBoolean(statement->position);
+			}
+			checkStatement(statement->u.whileStatement.body, local_table);
+            break;
+
+            break;
+        case STATEMENT_EMPTYSTATEMENT:
             break;
 
     }
