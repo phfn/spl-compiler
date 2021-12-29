@@ -16,31 +16,8 @@
 #include <types/types.h>
 #include <table/table.h>
 
-// proc fun(a: int, b: array[9] of int){
-// var c: int;
-// c := b[4];
-// }
 Type *getTypeOfExpression( Expression *exp, SymbolTable *local_table );
 
-void checkVariables(
-		VariableDeclarationList *variables,
-		SymbolTable* localTable
-		) {
-
-	while(!variables->isEmpty){
-		VariableDeclaration* current = variables->head;
-		variables = variables->tail;
-
-		// var b: int;
-		// typeExpression(intlit)
-		Type* type = createTypeForTypeExpression(current->typeExpression, localTable, current->position);
-//		type->u.
-
-	}
-}
-
-// var penis = array[21]of int
-// penis[3] = penis[5]
 Type *getTypeOfVariable(
         Variable *variable,
         SymbolTable *localTable
@@ -65,7 +42,7 @@ Type *getTypeOfVariable(
             }
         case VARIABLE_NAMEDVARIABLE:
             ;
-            //variable muss in symvoltable sein und eine variable sein
+            //variable muss in symboltable sein und eine variable sein
             Identifier *name = variable->u.namedVariable.name;
             Entry* lookedUp = lookup(localTable, name);
             if(lookedUp == NULL){
@@ -170,7 +147,6 @@ void checkStatement(
                 assignmentHasDifferentTypes(statement->position);
             }
             if (value->dataType->kind != TYPE_KIND_PRIMITIVE){
-                notImplemented();
                 assignmentRequiresIntegers(statement->position);
             }
 
@@ -182,16 +158,13 @@ void checkStatement(
         case STATEMENT_EMPTYSTATEMENT:
             break;
         case STATEMENT_IFSTATEMENT:
-//            steht iwie gleich oder kleiner oder so
             break;
         case STATEMENT_WHILESTATEMENT:
             break;
 
     }
 }
-void checkProcedure(
-		ParameterDeclarationList *parameters,
-		VariableDeclarationList *variables,
+void checkProcedureBody(
 		StatementList *body,
 		SymbolTable* localTable)
 {
@@ -201,26 +174,23 @@ void checkProcedure(
 		//error checks
         checkStatement(current, localTable);
 	}
-
 }
 
 void checkProcedures(Program *program, SymbolTable *globalTable) {
-    //TODO (assignment 4b): Check all procedure bodies for semantic errors
+    //Task: (assignment 4b): Check all procedure bodies for semantic errors
+
     GlobalDeclarationList *gdl = program->declarations;
-    GlobalDeclaration *current = gdl->head;
+    GlobalDeclaration *current;
     while (!gdl->isEmpty) {
         current = gdl->head;
         gdl = gdl->tail;
         if (current->kind == DECLARATION_PROCEDUREDECLARATION) {
-            //fuer alle proceduren
-		SymbolTable* localTable = lookup(globalTable, current->name)->u.procEntry.localTable;
+            //fuer alle Prozeduren
+            SymbolTable* localTable = lookup(globalTable, current->name)->u.procEntry.localTable;
 
-            ParameterDeclarationList *parameters = current->u.procedureDeclaration.parameters;
-            VariableDeclarationList *variables = current->u.procedureDeclaration.variables;
             StatementList *body = current->u.procedureDeclaration.body;
-            checkProcedure(parameters, variables, body, localTable);
+            checkProcedureBody(body, localTable);
 
         }
-
     }
 }
