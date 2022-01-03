@@ -42,6 +42,7 @@ Type *getTypeOfVariable(
                     variable->dataType = type_von_unserm_array_das_wir_accessen->u.arrayType.baseType;
                     return variable->dataType;
             }
+            break;
         case VARIABLE_NAMEDVARIABLE:
             ;
             //variable muss in symboltable sein und eine variable sein
@@ -56,6 +57,7 @@ Type *getTypeOfVariable(
             variable->dataType = lookedUp->u.varEntry.type;
             return variable->dataType;
     }
+    return NULL;
 }
 Type *getTypeOfBinaryExpression(Expression *exp, SymbolTable *local_table){
     Expression *left = exp->u.binaryExpression.leftOperand;
@@ -123,6 +125,7 @@ Type *getTypeOfExpression(
             return getTypeOfBinaryExpression(exp, local_table);
             break;
     }
+    return NULL;
 }
 
 void checkArguments(Statement *call_statement, Entry *procedure, SymbolTable *local_table){
@@ -132,12 +135,12 @@ void checkArguments(Statement *call_statement, Entry *procedure, SymbolTable *lo
 
     Expression *current_argument;
     ParameterType *current_parameter_type;
-    int index = 0;
+    int index = 1;
     while(!arguments->isEmpty){
         current_argument = arguments->head;
         arguments = arguments->tail;
         if(parameter_types->isEmpty){// wenn's keine prozedurtypen aber noch argumente gibt, wurden zu wenig uebergebnen
-            tooManyArguments(current_argument->position, proc_name);
+            tooManyArguments(call_statement->position, proc_name);
         }
         current_parameter_type = parameter_types->head;
         parameter_types = parameter_types->tail;
@@ -156,8 +159,7 @@ void checkArguments(Statement *call_statement, Entry *procedure, SymbolTable *lo
 //    arguments =   [ 1 ,  2 ,  3 ] -> []
 //    parametertypes[int, int, int, int] -> [int]
     if (!parameter_types->isEmpty){
-        tooFewArguments(arguments->head->position, proc_name);
-
+        tooFewArguments(call_statement->position, proc_name);
     }
 
 

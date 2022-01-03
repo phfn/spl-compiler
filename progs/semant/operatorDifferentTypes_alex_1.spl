@@ -1,0 +1,7 @@
+proc main() {
+    var x: array[2] of int;
+    var y: array[2] of int;
+
+    if (x = y)
+        ;
+}

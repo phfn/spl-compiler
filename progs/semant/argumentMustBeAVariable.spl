@@ -1,0 +1,5 @@
+proc abc(ref i: int) {}
+
+proc main() {
+    abc(1);
+}

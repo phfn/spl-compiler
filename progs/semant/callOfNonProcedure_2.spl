@@ -1,0 +1,7 @@
+proc abc() {}
+
+proc main() {
+    var abc: int;
+
+    abc();
+}

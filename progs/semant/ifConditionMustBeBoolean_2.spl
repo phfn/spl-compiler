@@ -1,0 +1,7 @@
+type newtype = array[1] of int;
+
+proc main() {
+    var a: newtype;
+
+    if (a);
+}

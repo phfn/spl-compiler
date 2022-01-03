@@ -1,0 +1,5 @@
+type newtype = array[2] of int;
+
+proc main() {
+    newtype := 1;
+}

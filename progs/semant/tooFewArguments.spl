@@ -1,0 +1,5 @@
+proc abc(i: int) {}
+
+proc main() {
+    abc();
+}
