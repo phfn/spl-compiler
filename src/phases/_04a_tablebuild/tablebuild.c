@@ -39,7 +39,7 @@ ParameterTypeList *push(ParameterTypeList *list, ParameterType *el) {
     return list;
 }
 
-ParameterTypeList *createParameterTypeList(ParameterDeclarationList *pdl, SymbolTable *table, Position pos) {
+ParameterTypeList *createParameterTypeList(ParameterDeclarationList *pdl, SymbolTable *local_table, Position pos) {
     ParameterTypeList *ptl = emptyParameterTypeList();
     ParameterTypeList *last_item = ptl;
     while (!pdl->isEmpty) {
@@ -47,10 +47,11 @@ ParameterTypeList *createParameterTypeList(ParameterDeclarationList *pdl, Symbol
         ParameterDeclaration *current = pdl->head;
         pdl = pdl->tail;
 
-        if (current->typeExpression->kind == TYPEEXPRESSION_ARRAYTYPEEXPRESSION && !current->isReference) {
+        current->typeExpression->dataType = createTypeForTypeExpression(current->typeExpression, local_table, current->position);
+        if (current->typeExpression->dataType->kind== TYPE_KIND_ARRAY && !current->isReference) {
             mustBeAReferenceParameter(pos, current->name);
         }
-        Type *type = createTypeForTypeExpression(current->typeExpression, table, pos);
+        Type *type = createTypeForTypeExpression(current->typeExpression, local_table, pos);
         ParameterType *parameterType = newParameterType(type, current->isReference);
 
         //Element ganz hinten anfügen
