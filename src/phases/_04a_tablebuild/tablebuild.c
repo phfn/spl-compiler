@@ -93,13 +93,14 @@ SymbolTable *createProcedureSymbolTable(ParameterDeclarationList *parameters, Va
         VariableDeclaration *current = variables->head;
         variables = variables->tail;
         Type *type = createTypeForTypeExpression(current->typeExpression, local_table, pos);
+        current->typeExpression->dataType = type;
         Identifier *name = current->name;
         //error checks
         Entry *lookedUpEntry = lookup(local_table, name);
         if (lookedUpEntry != NULL && lookedUpEntry->kind == ENTRY_KIND_VAR) {
             redeclarationAsVariable(pos, name);
         }
-        Entry *entry = newVarEntry(type, false);
+        Entry *entry = newVarEntry(current->typeExpression->dataType, false);
 
         enter(local_table, name, entry);
         //TODO nach errors gucken siehe vl folie 15 seite 5
