@@ -263,6 +263,7 @@ int calcOutgoingAreaSize(StatementList *body, SymbolTable *global_table){
 				int if_size = calcOutgoingAreaSize(wrapper_then, global_table);
 				int else_size = calcOutgoingAreaSize(wrapper_else, global_table);
 				statement_size = if_size > else_size? if_size: else_size;
+				break;
 
 			default:
 				continue;
