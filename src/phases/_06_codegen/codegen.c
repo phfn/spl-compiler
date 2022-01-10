@@ -35,6 +35,11 @@ void decrease_stack_pointer(){
 	}
 	register_stack_pointer -= 1;
 }
+int pushc(int value, FILE *out){
+	increase_stack_pointer();
+	emitRRI(out, "add", register_stack_pointer, value, 0);
+	return register_stack_pointer;
+}
 
 void genVariable(Variable *variable, SymbolTable *global_table, FILE *out);
 
@@ -149,7 +154,29 @@ void genVariable(Variable *variable, SymbolTable *global_table, FILE *out){
 
 			break;
 		case VARIABLE_ARRAYACCESS:
-			notImplemented();
+			;
+			Variable *array = variable->u.arrayAccess.array;
+			Expression *index = variable->u.arrayAccess.index;
+			genVariable(array, local_table, out); // start of array
+			int index_array = register_stack_pointer;
+
+			genExpression(index, local_table, out); // index
+			int index_index = register_stack_pointer;
+
+			//check index as unsigned int
+			// jump when index >= array size
+			int index_array_size = pushc(array->dataType->u.arrayType.size, out);
+			emitRRL(out, "bgeu", index_index, index_array_size, "_indexError");
+
+			//offset = index * byteSize
+			increase_stack_pointer();
+			emitRRI(out, "mul", register_stack_pointer, index_index, array->dataType->byteSize);
+			int offset = register_stack_pointer;
+
+			increase_stack_pointer();
+			//						scr				reg					offset
+			emitRRR(out, "add", index_array, register_stack_pointer , offset);
+
 			break;
 	}
 }
