@@ -41,7 +41,7 @@ int pushc(int value, FILE *out){
 	return register_stack_pointer;
 }
 
-void genVariable(Variable *variable, SymbolTable *global_table, FILE *out);
+void genVariable(Variable *variable, SymbolTable *local_table, FILE *out);
 
 /**
  * Emits needed import statements, to allow usage of the predefined functions and sets the correct settings
@@ -104,50 +104,49 @@ void genBinaryOperator(BinaryOperator operator, FILE *out){
 	decrease_stack_pointer();
 }
 
-void genExpression(Expression *expression, SymbolTable *global_table, FILE *out);
+void genExpression(Expression *expression, SymbolTable *local_table, FILE *out);
 
-void genIntLiteral(Expression *expression, SymbolTable *global_table, FILE *out){
+void genIntLiteral(Expression *expression, FILE *out){
 	int value = expression->u.intLiteral.value;
-	emitRRI(out, "add", register_stack_pointer, 0, value);
 	increase_stack_pointer();
+	emitRRI(out, "add", register_stack_pointer, 0, value);
 
 }
 //arr[3 * i] := arr
-void genVariableExpression(Expression *expression, SymbolTable *global_table, FILE *out){
+void genVariableExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	Variable *variable = expression->u.variableExpression.variable;
-	genVariable(variable, global_table, out);
+	genVariable(variable, local_table, out);
 }
 
-void genBinaryExpression(Expression *expression, SymbolTable *global_table, FILE *out){
+void genBinaryExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	Expression *leftOperand = expression->u.binaryExpression.leftOperand;
 	Expression *rightOperand = expression->u.binaryExpression.rightOperand;
 	BinaryOperator operator = expression->u.binaryExpression.operator;
 
-	genExpression(leftOperand, global_table, out);
-	genExpression(rightOperand, global_table, out);
+	genExpression(leftOperand, local_table, out);
+	genExpression(rightOperand, local_table, out);
 	genBinaryOperator(operator, out);
 }
 
-void genExpression(Expression *expression, SymbolTable *global_table, FILE *out){
+void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	switch(expression->kind){
 		case EXPRESSION_INTLITERAL:
-			genIntLiteral(expression, global_table, out);
+			genIntLiteral(expression, out);
 			break;
 		case EXPRESSION_VARIABLEEXPRESSION:
-			genVariableExpression(expression, global_table, out);
+			genVariableExpression(expression, local_table, out);
 			break;
 		case EXPRESSION_BINARYEXPRESSION:
-			genBinaryExpression(expression, global_table, out);
+			genBinaryExpression(expression, local_table, out);
 			break;
 	}
 }
-
-void genVariable(Variable *variable, SymbolTable *global_table, FILE *out){
+void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 	switch(variable->kind){
 		case VARIABLE_NAMEDVARIABLE:
 			;
 			Identifier *name = variable->u.namedVariable.name;
-			Entry *looked_up = lookup(global_table, name);
+			Entry *looked_up = lookup(local_table, name);
 			increase_stack_pointer();
 			emitRRI(out, "add", register_stack_pointer, 25, looked_up->u.varEntry.offset);
 			
@@ -180,57 +179,57 @@ void genVariable(Variable *variable, SymbolTable *global_table, FILE *out){
 			break;
 	}
 }
-void genAssignStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genAssignStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	Variable *target = statement->u.assignStatement.target;
 	Expression *value = statement->u.assignStatement.value;
 	//iwas fuer target
 	//lege adresse der variable auf stack
-	genVariable(target, global_table, out);//register_stack_pointer-1
+	genVariable(target, local_table, out);//register_stack_pointer-1
 	
 
 	//iwas fuer value
 	//lege ergebniss von expression auf stack
-	genExpression(value, global_table, out); //register_stack_pointer
+	genExpression(value, local_table, out); //register_stack_pointer
 
 	//assign					src						reg				offset
 	emitRRI(out, "stw", register_stack_pointer, register_stack_pointer-1, 0);
 	
 }
-void genIfStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
-void genWhileStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
-void genCompoundStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
-void genCallStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
-void genEmptyStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genEmptyStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
 
-void genStatement(Statement *statement, SymbolTable *global_table, FILE *out){
+void genStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	switch(statement->kind){
 		case STATEMENT_ASSIGNSTATEMENT:
-			genAssignStatement(statement, global_table, out);
+			genAssignStatement(statement, local_table, out);
 			break;
 		case STATEMENT_IFSTATEMENT:
-			genIfStatement(statement, global_table, out);
+			genIfStatement(statement, local_table, out);
 			break;
 		case STATEMENT_WHILESTATEMENT:
-			genWhileStatement(statement, global_table, out);
+			genWhileStatement(statement, local_table, out);
 			break;
 		case STATEMENT_COMPOUNDSTATEMENT:
-			genCompoundStatement(statement, global_table, out);
+			genCompoundStatement(statement, local_table, out);
 			break;
 		case STATEMENT_CALLSTATEMENT:
-			genCallStatement(statement, global_table, out);
+			genCallStatement(statement, local_table, out);
 			break;
 		case STATEMENT_EMPTYSTATEMENT:
-			genEmptyStatement(statement, global_table, out);
+			genEmptyStatement(statement, local_table, out);
 			break;
 	}
 }
@@ -240,8 +239,10 @@ void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTabl
 	while(!statement_list->isEmpty){
 		current = statement_list->head;
 		statement_list = statement_list->tail;
+		Entry *looked_up = lookup(globalTable, procedureDeclaration->name);
+		SymbolTable *local_table = looked_up->u.procEntry.localTable;
 
-		genStatement(current, globalTable, out);
+		genStatement(current, local_table, out);
 	}
 	
 }
