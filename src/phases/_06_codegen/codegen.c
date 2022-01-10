@@ -4,6 +4,8 @@
 
 #include "codegen.h"
 
+#include <stdbool.h>
+#include <stdio.h>
 #include <util/errors.h>
 #include <assert.h>
 #include "absyn/_declarations.h"
@@ -23,6 +25,9 @@
 #define STACK_POINTER  29
 
 int register_stack_pointer = FIRST_REGISTER - 1;
+int label_counter = 0;
+
+
 void increase_stack_pointer(){
 	if(register_stack_pointer >= LAST_REGISTER){
 		notImplemented();
@@ -37,11 +42,12 @@ void decrease_stack_pointer(){
 }
 int pushc(int value, FILE *out){
 	increase_stack_pointer();
-	emitRRI(out, "add", register_stack_pointer, value, 0);
+	emitRRI(out, "add", register_stack_pointer, 0, value);
 	return register_stack_pointer;
 }
 
 void genVariable(Variable *variable, SymbolTable *local_table, FILE *out);
+void genStatement(Statement *statement, SymbolTable *local_table, FILE *out);
 
 /**
  * Emits needed import statements, to allow usage of the predefined functions and sets the correct settings
@@ -199,7 +205,29 @@ void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
 void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out){
-	notImplemented();
+	Expression *condition = statement->u.whileStatement.condition;
+	Statement *body = statement->u.whileStatement.body;
+
+	int label_index = ++label_counter;
+	char end_label[100] ;
+	char start_label[100] ;
+	sprintf(start_label, "while_start_%08d", label_index);
+	sprintf(end_label, "while_end_%08d", label_index);
+
+	emitLabel(out, start_label);
+	genExpression(condition, local_table, out);
+	int index_condition = register_stack_pointer;
+
+	//if ergebniss der expression != true
+	int index_true = pushc(true, out);
+	emitRRL(out, "bne", index_condition, index_true, end_label);
+	genStatement(body, local_table, out);
+	emitJump(out, start_label);
+
+	emitLabel(out, end_label);
+
+
+
 }
 void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
