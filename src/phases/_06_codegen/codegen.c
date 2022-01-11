@@ -75,6 +75,31 @@ void assemblerProlog(FILE *out) {
 
 
 
+// void genComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, int op2, char* label){
+// 	switch(operator){
+// 		case ABSYN_OP_EQU:
+// 			emitRRL(out, "bne", op1, op2, label);
+// 			break;
+// 		case ABSYN_OP_NEQ:
+// 			emitRRL(out, "beq", op1, op2, label);
+// 			break;
+// 		case ABSYN_OP_GRT:
+// 			emitRRL(out, "ble", op1, op2, label);
+// 			break;
+// 		case ABSYN_OP_GRE:
+// 			emitRRL(out, "blt", op1, op2, label);
+// 			break;
+// 		case ABSYN_OP_LST:
+// 			emitRRL(out, "bge", op1, op2, label);
+// 			break;
+// 		case ABSYN_OP_LSE:
+// 			emitRRL(out, "bgt", op1, op2, label);
+// 			break;
+// 		default:
+// 			error("Expected comparison operator but found arithmetic");
+// 		}
+//
+// }
 void genReversedComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, int op2, char* label){
 	switch(operator){
 		case ABSYN_OP_EQU:
@@ -156,6 +181,19 @@ void genJumpIfComparisonIsFalse(Expression *comparisonExpression, SymbolTable *l
 	decrease_stack_pointer();
 	decrease_stack_pointer();
 }
+// void genJumpIfComparisonIsTrue(Expression *comparisonExpression, SymbolTable *local_table, FILE *out, char* label){
+// 	Expression *leftOperand = comparisonExpression->u.binaryExpression.leftOperand;
+// 	Expression *rightOperand = comparisonExpression->u.binaryExpression.rightOperand;
+// 	BinaryOperator operator = comparisonExpression->u.binaryExpression.operator;
+//
+// 	genExpression(leftOperand, local_table, out);
+// 	int index_left = register_stack_pointer;
+// 	genExpression(rightOperand, local_table, out);
+// 	int index_right = register_stack_pointer;
+// 	genComparisonBinaryOperator(operator, out, index_left, index_right, label);
+// 	decrease_stack_pointer();
+// 	decrease_stack_pointer();
+// }
 
 void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	switch(expression->kind){
@@ -227,7 +265,26 @@ void genAssignStatement(Statement *statement, SymbolTable *local_table, FILE *ou
 	
 }
 void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
-	notImplemented();
+	Expression *condition = statement->u.ifStatement.condition;
+	Statement *than_part = statement->u.ifStatement.thenPart;
+	Statement *else_part = statement->u.ifStatement.elsePart;
+	int label_index = label_counter++;
+	char else_label[100] ;
+
+#ifdef COPATIBLE_MODE
+	sprintf(else_label, "L%d", label_index);
+	label_index = label_counter++;
+#else
+	sprintf(else_label, "else_%d", label_index);
+#endif
+	genJumpIfComparisonIsFalse(condition, local_table, out, else_label);
+
+#ifndef COPATIBLE_MODE
+	emit(out, ";than_%d:", label_index);
+#endif
+	genStatement(than_part, local_table, out);
+	emitLabel(out, else_label);
+	genStatement(else_part, local_table, out);
 }
 void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	Expression *condition = statement->u.whileStatement.condition;
