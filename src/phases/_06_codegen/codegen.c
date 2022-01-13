@@ -31,13 +31,13 @@ int label_counter = 0;
 
 void increase_stack_pointer(){
 	if(register_stack_pointer >= LAST_REGISTER){
-		notImplemented();
+		registerOverflow();
 	}
 	register_stack_pointer += 1;
 }
 void decrease_stack_pointer(){
 	if(register_stack_pointer < FIRST_REGISTER){
-		notImplemented();
+		error("Register Underflow");
 	}
 	register_stack_pointer -= 1;
 }
@@ -346,6 +346,7 @@ void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTabl
 	//	– Prozedur-Epilog ausgeben
 	notImplemented();
 	genStatementList(statement_list, local_table, out);
+	notImplemented();
 	
 }
 void genTypeDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTable *globalTable, FILE *out){
