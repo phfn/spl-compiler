@@ -293,7 +293,14 @@ void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out
 
 }
 void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *out){
-	notImplemented();
+	StatementList *statements = statement->u.compoundStatement.statements;
+	Statement *current;
+	while(!statements->isEmpty){
+		current = statements->head;
+		statements = statements->tail;
+
+		genStatement(current, local_table, out);
+	}
 }
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
