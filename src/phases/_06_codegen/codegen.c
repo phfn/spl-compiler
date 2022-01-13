@@ -305,9 +305,7 @@ void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
 }
-void genEmptyStatement(Statement *statement, SymbolTable *local_table, FILE *out){
-	notImplemented();
-}
+void genEmptyStatement(Statement *statement, SymbolTable *local_table, FILE *out){}
 
 void genStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	switch(statement->kind){
