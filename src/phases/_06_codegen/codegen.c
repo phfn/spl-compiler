@@ -49,6 +49,7 @@ int pushc(int value, FILE *out){
 
 void genVariable(Variable *variable, SymbolTable *local_table, FILE *out);
 void genStatement(Statement *statement, SymbolTable *local_table, FILE *out);
+void genStatementList(StatementList *statement_list, SymbolTable *local_table, FILE *out);
 
 /**
  * Emits needed import statements, to allow usage of the predefined functions and sets the correct settings
@@ -294,13 +295,7 @@ void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out
 }
 void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	StatementList *statements = statement->u.compoundStatement.statements;
-	Statement *current;
-	while(!statements->isEmpty){
-		current = statements->head;
-		statements = statements->tail;
-
-		genStatement(current, local_table, out);
-	}
+	genStatementList(statements, local_table, out);
 }
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	notImplemented();
@@ -329,17 +324,28 @@ void genStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 			break;
 	}
 }
-void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTable *globalTable, FILE *out){
-	StatementList *statement_list = procedureDeclaration->u.procedureDeclaration.body;
+void genStatementList(StatementList *statement_list, SymbolTable *local_table, FILE *out){
+
 	Statement *current;
 	while(!statement_list->isEmpty){
 		current = statement_list->head;
 		statement_list = statement_list->tail;
-		Entry *looked_up = lookup(globalTable, procedureDeclaration->name);
-		SymbolTable *local_table = looked_up->u.procEntry.localTable;
 
 		genStatement(current, local_table, out);
 	}
+}
+void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTable *globalTable, FILE *out){
+	StatementList *statement_list = procedureDeclaration->u.procedureDeclaration.body;
+	Entry *looked_up = lookup(globalTable, procedureDeclaration->name);
+	SymbolTable *local_table = looked_up->u.procEntry.localTable;
+
+	//TODO
+	//	– Framegröße berechnen
+	//	– Prozedur-Prolog ausgeben
+	//	– Code für Prozedurkörper erzeugen✓
+	//	– Prozedur-Epilog ausgeben
+	notImplemented();
+	genStatementList(statement_list, local_table, out);
 	
 }
 void genTypeDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTable *globalTable, FILE *out){
