@@ -14,9 +14,11 @@
 #include "absyn/statements.h"
 #include "absyn/variables.h"
 #include "codeprint.h"
+#include "phases/_05_varalloc/stack_layout.h"
 #include "table/entry.h"
 #include "table/identifier.h"
 #include "table/table.h"
+#include "types/types.h"
 
 #define FIRST_REGISTER 8
 #define LAST_REGISTER 23
@@ -297,8 +299,38 @@ void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *
 	StatementList *statements = statement->u.compoundStatement.statements;
 	genStatementList(statements, local_table, out);
 }
+
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
-	notImplemented();
+	Identifier *procedure_name = statement->u.callStatement.procedureName;
+	Entry *looked_up = lookup(local_table, procedure_name);
+	StackLayout *stack_layout = looked_up->u.procEntry.stackLayout;
+
+	ExpressionList *arguments = statement->u.callStatement.arguments;
+	Expression *current_argument;
+	ParameterTypeList *parameter_types = looked_up->u.procEntry.parameterTypes;
+	ParameterType *current_parameter_type;
+
+	int argument_place = 0;
+	while(!arguments->isEmpty){
+		current_argument = arguments->head;
+		arguments = arguments->tail;
+		current_parameter_type = parameter_types->head;
+		parameter_types = parameter_types->tail;
+
+		genExpression(current_argument, local_table, out);
+		if(current_argument->kind == EXPRESSION_VARIABLEEXPRESSION){
+			emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
+		}
+		commentRRI(out, "stw", register_stack_pointer, STACK_POINTER, current_parameter_type->offset, "store argument #%d", argument_place);
+		decrease_stack_pointer();
+
+		argument_place += 1;
+	}
+
+		emit(out, "\tjal\t%s", procedure_name->string);
+	
+
+
 }
 void genEmptyStatement(Statement *statement, SymbolTable *local_table, FILE *out){}
 
