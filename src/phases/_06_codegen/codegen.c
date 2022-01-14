@@ -14,7 +14,6 @@
 #include "absyn/statements.h"
 #include "absyn/variables.h"
 #include "codeprint.h"
-#include "phases/_05_varalloc/stack_layout.h"
 #include "table/entry.h"
 #include "table/identifier.h"
 #include "table/table.h"
@@ -173,6 +172,13 @@ void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 			break;
 	}
 }
+
+/**
+ * Load a variable and put its address on the register stack
+ * When variable is an array-access, it loads the adress of the array + the offset of the index
+ * Afterwards register_stack_pointer in increased
+ * Generate at least one "add" instruction as last instruction
+ */
 void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 	switch(variable->kind){
 		case VARIABLE_NAMEDVARIABLE:
@@ -180,33 +186,34 @@ void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 			Identifier *name = variable->u.namedVariable.name;
 			Entry *looked_up = lookup(local_table, name);
 			increase_stack_pointer();
-			emitRRI(out, "add", register_stack_pointer, 25, looked_up->u.varEntry.offset);
+			emitRRI(out, "add", register_stack_pointer, FRAME_POINTER, looked_up->u.varEntry.offset);
 			
 
 			break;
 		case VARIABLE_ARRAYACCESS:
-			;
+			;// for exaple arr[5]
 			Variable *array = variable->u.arrayAccess.array;
 			Expression *index = variable->u.arrayAccess.index;
-			genVariable(array, local_table, out); // start of array
-			int index_array = register_stack_pointer;
+			genVariable(array, local_table, out); // write adress of arr on the stack
+			int adress_array = register_stack_pointer;
 
-			genExpression(index, local_table, out); // index
-			int index_index = register_stack_pointer;
+			genExpression(index, local_table, out); // write the result of the index expression. here 5
+			int adress_index = register_stack_pointer; 
 
 			//check index as unsigned int
 			// jump when index >= array size
 			int index_array_size = pushc(array->dataType->u.arrayType.size, out);
-			emitRRL(out, "bgeu", index_index, index_array_size, "_indexError");
+			emitRRL(out, "bgeu", adress_index, index_array_size, "_indexError");
+			decrease_stack_pointer();// remove array size
 
-			//offset = index * byteSize
-			increase_stack_pointer();
-			emitRRI(out, "mul", register_stack_pointer, index_index, array->dataType->byteSize);
+			//calculate offset = index * byteSize of baseType . In our example 5*4
+			emitRRI(out, "mul", register_stack_pointer, adress_index, array->dataType->u.arrayType.baseType->byteSize);
 			int offset = register_stack_pointer;
+			decrease_stack_pointer();
 
-			increase_stack_pointer();
-			//						scr				reg					offset
-			emitRRR(out, "add", index_array, register_stack_pointer , offset);
+			//push the result = `adress of array + offset from the index` on the stack
+			//					destination			op1					op2
+			emitRRR(out, "add", register_stack_pointer, adress_array , offset);
 
 			break;
 	}
@@ -303,7 +310,6 @@ void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	Identifier *procedure_name = statement->u.callStatement.procedureName;
 	Entry *looked_up = lookup(local_table, procedure_name);
-	StackLayout *stack_layout = looked_up->u.procEntry.stackLayout;
 
 	ExpressionList *arguments = statement->u.callStatement.arguments;
 	Expression *current_argument;
