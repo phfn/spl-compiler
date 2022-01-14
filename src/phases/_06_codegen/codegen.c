@@ -338,7 +338,6 @@ void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out)
 
 
 }
-void genEmptyStatement(Statement *statement, SymbolTable *local_table, FILE *out){}
 
 void genStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	switch(statement->kind){
@@ -358,7 +357,6 @@ void genStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 			genCallStatement(statement, local_table, out);
 			break;
 		case STATEMENT_EMPTYSTATEMENT:
-			genEmptyStatement(statement, local_table, out);
 			break;
 	}
 }
