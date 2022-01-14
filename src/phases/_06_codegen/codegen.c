@@ -137,6 +137,7 @@ void genIntLiteral(Expression *expression, FILE *out){
 void genVariableExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	Variable *variable = expression->u.variableExpression.variable;
 	genVariable(variable, local_table, out);
+	emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
 }
 
 void genArithmeticBinaryExpression(Expression *expression, SymbolTable *local_table, FILE *out){
@@ -327,9 +328,6 @@ void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out)
 		parameter_types = parameter_types->tail;
 
 		genExpression(current_argument, local_table, out);
-		if(current_argument->kind == EXPRESSION_VARIABLEEXPRESSION){
-			emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
-		}
 		commentRRI(out, "stw", register_stack_pointer, STACK_POINTER, current_parameter_type->offset, "store argument #%d", argument_place);
 		decrease_stack_pointer();
 
