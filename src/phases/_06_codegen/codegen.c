@@ -103,18 +103,21 @@ void genReversedComparisonBinaryOperator(BinaryOperator operator, FILE *out, int
 
 }
 void genArithmeticBinaryOperator(BinaryOperator operator, FILE *out){
+#ifndef COPATIBLE_MODE
+	emit(out, "%s", ";genArithmeticBinaryOperator");
+#endif
 	switch(operator){
 		case ABSYN_OP_ADD:;
-			emitRRI(out, "add", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
+			emitRRR(out, "add", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
 			break;
 		case ABSYN_OP_SUB:
-			emitRRI(out, "sub", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
+			emitRRR(out, "sub", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
 			break;
 		case ABSYN_OP_MUL:
-			emitRRI(out, "mul", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
+			emitRRR(out, "mul", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
 			break;
 		case ABSYN_OP_DIV:
-			emitRRI(out, "div", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
+			emitRRR(out, "div", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
 			break;
 		default:
 			error("Expected arithetic operator but found comparision");
