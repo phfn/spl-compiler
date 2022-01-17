@@ -14,6 +14,7 @@
 #include "absyn/statements.h"
 #include "absyn/variables.h"
 #include "codeprint.h"
+#include "phases/_05_varalloc/stack_layout.h"
 #include "table/entry.h"
 #include "table/identifier.h"
 #include "table/table.h"
@@ -25,7 +26,7 @@
 #define FRAME_POINTER  25
 #define STACK_POINTER  29
 
-#define COPATIBLE_MODE
+#define COMPATIBLE_MODE
 int register_stack_pointer = FIRST_REGISTER - 1;
 int label_counter = 0;
 
@@ -76,8 +77,15 @@ void assemblerProlog(FILE *out) {
 }
 
 
+void write_comment(FILE *out, char *format) {
+#ifndef COMPATIBLE_MODE
+	emit(out, "; %s", format);
+#endif
+
+}
 
 void genReversedComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, int op2, char* label){
+	write_comment(out, "comparison operator");
 	switch(operator){
 		case ABSYN_OP_EQU:
 			emitRRL(out, "bne", op1, op2, label);
@@ -103,9 +111,7 @@ void genReversedComparisonBinaryOperator(BinaryOperator operator, FILE *out, int
 
 }
 void genArithmeticBinaryOperator(BinaryOperator operator, FILE *out){
-#ifndef COPATIBLE_MODE
-	emit(out, "%s", ";genArithmeticBinaryOperator");
-#endif
+	write_comment(out, "arithmetic operator");
 	switch(operator){
 		case ABSYN_OP_ADD:;
 			emitRRR(out, "add", register_stack_pointer-1, register_stack_pointer-1, register_stack_pointer);
@@ -128,6 +134,7 @@ void genArithmeticBinaryOperator(BinaryOperator operator, FILE *out){
 void genExpression(Expression *expression, SymbolTable *local_table, FILE *out);
 
 void genIntLiteral(Expression *expression, FILE *out){
+	write_comment(out, "intlit");
 	int value = expression->u.intLiteral.value;
 	increase_stack_pointer();
 	emitRRI(out, "add", register_stack_pointer, 0, value);
@@ -135,6 +142,7 @@ void genIntLiteral(Expression *expression, FILE *out){
 }
 //arr[3 * i] := arr
 void genVariableExpression(Expression *expression, SymbolTable *local_table, FILE *out){
+	write_comment(out, "variable Expression");
 	Variable *variable = expression->u.variableExpression.variable;
 	genVariable(variable, local_table, out);
 	emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
@@ -187,6 +195,7 @@ void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 	switch(variable->kind){
 		case VARIABLE_NAMEDVARIABLE:
 			;
+			write_comment(out, "named variable");
 			Identifier *name = variable->u.namedVariable.name;
 			Entry *looked_up = lookup(local_table, name);
 			increase_stack_pointer();
@@ -195,34 +204,36 @@ void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 
 			break;
 		case VARIABLE_ARRAYACCESS:
-			;// for exaple arr[5]
+			;// for example arr[5]
+			write_comment(out, "variable, array access");
 			Variable *array = variable->u.arrayAccess.array;
 			Expression *index = variable->u.arrayAccess.index;
-			genVariable(array, local_table, out); // write adress of arr on the stack
-			int adress_array = register_stack_pointer;
+			genVariable(array, local_table, out); // write address of arr on the stack
+			int address_array = register_stack_pointer;
 
-			genExpression(index, local_table, out); // write the result of the index expression. here 5
-			int adress_index = register_stack_pointer; 
+			genExpression(index, local_table, out); // write the result of the index expression. Here 5
+			int address_index = register_stack_pointer; 
 
 			//check index as unsigned int
 			// jump when index >= array size
 			int index_array_size = pushc(array->dataType->u.arrayType.size, out);
-			emitRRL(out, "bgeu", adress_index, index_array_size, "_indexError");
+			emitRRL(out, "bgeu", address_index, index_array_size, "_indexError");
 			decrease_stack_pointer();// remove array size
 
 			//calculate offset = index * byteSize of baseType . In our example 5*4
-			emitRRI(out, "mul", register_stack_pointer, adress_index, array->dataType->u.arrayType.baseType->byteSize);
+			emitRRI(out, "mul", register_stack_pointer, address_index, array->dataType->u.arrayType.baseType->byteSize);
 			int offset = register_stack_pointer;
 			decrease_stack_pointer();
 
-			//push the result = `adress of array + offset from the index` on the stack
+			//push the result = `address of array + offset from the index` on the stack
 			//					destination			op1					op2
-			emitRRR(out, "add", register_stack_pointer, adress_array , offset);
+			emitRRR(out, "add", register_stack_pointer, address_array , offset);
 
 			break;
 	}
 }
 void genAssignStatement(Statement *statement, SymbolTable *local_table, FILE *out){
+	write_comment(out, "assign_statement");
 	Variable *target = statement->u.assignStatement.target;
 	Expression *value = statement->u.assignStatement.value;
 	//iwas fuer target
@@ -241,13 +252,14 @@ void genAssignStatement(Statement *statement, SymbolTable *local_table, FILE *ou
 	
 }
 void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
+	write_comment(out, "if_statement");
 	Expression *condition = statement->u.ifStatement.condition;
 	Statement *than_part = statement->u.ifStatement.thenPart;
 	Statement *else_part = statement->u.ifStatement.elsePart;
 	int label_index = label_counter++;
 	char else_label[100] ;
 	char endif_label[100] ;
-#ifdef COPATIBLE_MODE
+#ifdef COMPATIBLE_MODE
 	bool has_else = else_part->kind != STATEMENT_EMPTYSTATEMENT;
 	label_counter--;
 	sprintf(else_label, "L%d", label_counter);
@@ -266,9 +278,10 @@ void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 #else
 	sprintf(endif_label, "endif_%d", label_index);
 	sprintf(else_label, "else_%d", label_index);
+
 	emit(out, ";if_%d:", label_index);
 	genJumpIfComparisonIsFalse(condition, local_table, out, else_label);
-	emit(out, ";than_%d:", label_index);
+	emit(out, ";then_%d:", label_index);
 	genStatement(than_part, local_table, out);
 	emitJump(out, endif_label);
 	emitLabel(out, else_label);
@@ -278,6 +291,7 @@ void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 
 }
 void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out){
+	write_comment(out, "while_statement");
 	Expression *condition = statement->u.whileStatement.condition;
 	Statement *body = statement->u.whileStatement.body;
 
@@ -285,7 +299,7 @@ void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out
 	char end_label[100] ;
 	char start_label[100] ;
 
-#ifdef COPATIBLE_MODE
+#ifdef COMPATIBLE_MODE
 	sprintf(start_label, "L%d", label_index);
 	label_index = label_counter++;
 	sprintf(end_label, "L%d", label_index);
@@ -307,11 +321,13 @@ void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out
 
 }
 void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *out){
+	write_comment(out, "compound_statement");
 	StatementList *statements = statement->u.compoundStatement.statements;
 	genStatementList(statements, local_table, out);
 }
 
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
+	write_comment(out, "call_statement");
 	Identifier *procedure_name = statement->u.callStatement.procedureName;
 	Entry *looked_up = lookup(local_table, procedure_name);
 
