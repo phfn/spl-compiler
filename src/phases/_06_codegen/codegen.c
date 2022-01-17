@@ -15,6 +15,7 @@
 #include "absyn/variables.h"
 #include "codeprint.h"
 #include "phases/_05_varalloc/stack_layout.h"
+#include "phases/_05_varalloc/varalloc.h"
 #include "table/entry.h"
 #include "table/identifier.h"
 #include "table/table.h"
@@ -391,15 +392,41 @@ void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTabl
 	StatementList *statement_list = procedureDeclaration->u.procedureDeclaration.body;
 	Entry *looked_up = lookup(globalTable, procedureDeclaration->name);
 	SymbolTable *local_table = looked_up->u.procEntry.localTable;
+	StackLayout *stack_layout = looked_up->u.procEntry.stackLayout;
 
-	//TODO
-	//	– Framegröße berechnen
+
 	//	– Prozedur-Prolog ausgeben
+	int fp_size = REF_BYTE_SIZE;
+	int return_size = isLeafProcedure(stack_layout)? 0 :REF_BYTE_SIZE;
+	int stack_size = getFrameSize(stack_layout);
+	int outgoingAreaSize = stack_layout->outgoingAreaSize != -1? stack_layout->outgoingAreaSize: 0;
+	int return_offset = - (stack_layout->localVarAreaSize + fp_size + return_size);
+
+	write_comment(out, "function prolog");
+
+	emit(out, "");
+	emitSS(out, ".export", procedureDeclaration->name->string);
+	emitLabel(out, "%s", procedureDeclaration->name->string);
+
+	commentRRI(out, "sub", STACK_POINTER, STACK_POINTER, stack_size, "allocate frame");
+	commentRRI(out, "stw", FRAME_POINTER, STACK_POINTER, outgoingAreaSize + return_size, "save old frame pointer");
+	commentRRI(out, "add", FRAME_POINTER, STACK_POINTER, stack_size, "setup new frame pointer");
+	if(!isLeafProcedure(stack_layout)){
+		commentRRI(out, "stw", 31, FRAME_POINTER, return_offset, "save return register");
+	}
+
 	//	– Code für Prozedurkörper erzeugen✓
-	//	– Prozedur-Epilog ausgeben
-	notImplemented();
+	write_comment(out, "function statements");
 	genStatementList(statement_list, local_table, out);
-	notImplemented();
+
+	//	– Prozedur-Epilog ausgeben
+	write_comment(out, "function epilog");
+	if(!isLeafProcedure(stack_layout)){
+		commentRRI(out, "ldw", 31, FRAME_POINTER, return_offset, "restore return register");
+	}
+	commentRRI(out, "ldw", FRAME_POINTER, STACK_POINTER, outgoingAreaSize + return_size, "restore old frame pointer");
+	commentRRI(out, "add", STACK_POINTER, STACK_POINTER, stack_size, "release frame");
+	commentR(out, "jr", 31, "return");
 	
 }
 void genTypeDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTable *globalTable, FILE *out){
