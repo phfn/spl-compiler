@@ -27,7 +27,7 @@
 #define FRAME_POINTER  25
 #define STACK_POINTER  29
 
-#define COMPATIBLE_MODE
+//#define COMPATIBLE_MODE
 int register_stack_pointer = FIRST_REGISTER - 1;
 int label_counter = 0;
 
@@ -50,9 +50,10 @@ int pushc(int value, FILE *out){
 	return register_stack_pointer;
 }
 
-void genVariable(Variable *variable, SymbolTable *local_table, FILE *out);
+void genLoadVariableAddress(Variable *variable, SymbolTable *local_table, FILE *out);
 void genStatement(Statement *statement, SymbolTable *local_table, FILE *out);
 void genStatementList(StatementList *statement_list, SymbolTable *local_table, FILE *out);
+bool VariableIsRef(Variable *variable, SymbolTable *local_table, FILE *out);
 
 /**
  * Emits needed import statements, to allow usage of the predefined functions and sets the correct settings
@@ -142,11 +143,13 @@ void genIntLiteral(Expression *expression, FILE *out){
 
 }
 //arr[3 * i] := arr
-void genVariableExpression(Expression *expression, SymbolTable *local_table, FILE *out){
+void genVariableExpression(Expression *expression, SymbolTable *local_table, FILE *out, bool load){
 	write_comment(out, "variable Expression");
 	Variable *variable = expression->u.variableExpression.variable;
-	genVariable(variable, local_table, out);
-	emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
+	genLoadVariableAddress(variable, local_table, out);
+	if(load){
+		emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
+	}
 }
 
 void genArithmeticBinaryExpression(Expression *expression, SymbolTable *local_table, FILE *out){
@@ -178,7 +181,7 @@ void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 			genIntLiteral(expression, out);
 			break;
 		case EXPRESSION_VARIABLEEXPRESSION:
-			genVariableExpression(expression, local_table, out);
+			genVariableExpression(expression, local_table, out, true);
 			break;
 		case EXPRESSION_BINARYEXPRESSION:
 			genArithmeticBinaryExpression(expression, local_table, out);
@@ -186,13 +189,19 @@ void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	}
 }
 
+void genLoadVariable(Variable *variable, SymbolTable *local_table, FILE *out){
+	genLoadVariableAddress(variable, local_table, out);
+	emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
+}
+
+
 /**
  * Load a variable and put its address on the register stack
  * When variable is an array-access, it loads the adress of the array + the offset of the index
  * Afterwards register_stack_pointer in increased
  * Generate at least one "add" instruction as last instruction
  */
-void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
+void genLoadVariableAddress(Variable *variable, SymbolTable *local_table, FILE *out){
 	switch(variable->kind){
 		case VARIABLE_NAMEDVARIABLE:
 			;
@@ -201,6 +210,9 @@ void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 			Entry *looked_up = lookup(local_table, name);
 			increase_stack_pointer();
 			emitRRI(out, "add", register_stack_pointer, FRAME_POINTER, looked_up->u.varEntry.offset);
+			if(looked_up->u.varEntry.isRef){
+				emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
+			}
 			
 
 			break;
@@ -209,7 +221,7 @@ void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 			write_comment(out, "variable, array access");
 			Variable *array = variable->u.arrayAccess.array;
 			Expression *index = variable->u.arrayAccess.index;
-			genVariable(array, local_table, out); // write address of arr on the stack
+			genLoadVariableAddress(array, local_table, out); // write address of arr on the stack
 			int address_array = register_stack_pointer;
 
 			genExpression(index, local_table, out); // write the result of the index expression. Here 5
@@ -233,13 +245,24 @@ void genVariable(Variable *variable, SymbolTable *local_table, FILE *out){
 			break;
 	}
 }
+
+bool VariableIsRef(Variable *variable, SymbolTable *local_table, FILE *out){
+	if(variable->kind == VARIABLE_ARRAYACCESS){
+		return VariableIsRef(variable->u.arrayAccess.array, local_table, out);
+	}
+	if(lookup(local_table, variable->u.namedVariable.name)->u.varEntry.isRef){
+		return true;
+	}
+	return false;
+}
+
 void genAssignStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	write_comment(out, "assign_statement");
 	Variable *target = statement->u.assignStatement.target;
 	Expression *value = statement->u.assignStatement.value;
 	//iwas fuer target
 	//lege adresse der variable auf stack
-	genVariable(target, local_table, out);//register_stack_pointer-1
+	genLoadVariableAddress(target, local_table, out);//register_stack_pointer-1
 	
 
 	//iwas fuer value
@@ -327,6 +350,24 @@ void genCompoundStatement(Statement *statement, SymbolTable *local_table, FILE *
 	genStatementList(statements, local_table, out);
 }
 
+void genArgumentExpression(Expression *expression, SymbolTable *local_table, FILE *out, ParameterType* parameter_type){
+	switch(expression->kind){
+		case EXPRESSION_INTLITERAL:
+			genIntLiteral(expression, out);
+			break;
+		case EXPRESSION_VARIABLEEXPRESSION:
+			if(parameter_type->isRef){
+				genVariableExpression(expression, local_table, out, false);
+			}else{
+				genVariableExpression(expression, local_table, out, true);
+			}
+			break;
+		case EXPRESSION_BINARYEXPRESSION:
+			genArithmeticBinaryExpression(expression, local_table, out);
+			break;
+	}
+}
+
 void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	write_comment(out, "call_statement");
 	Identifier *procedure_name = statement->u.callStatement.procedureName;
@@ -344,7 +385,7 @@ void genCallStatement(Statement *statement, SymbolTable *local_table, FILE *out)
 		current_parameter_type = parameter_types->head;
 		parameter_types = parameter_types->tail;
 
-		genExpression(current_argument, local_table, out);
+		genArgumentExpression(current_argument, local_table, out, current_parameter_type);
 		commentRRI(out, "stw", register_stack_pointer, STACK_POINTER, current_parameter_type->offset, "store argument #%d", argument_place);
 		decrease_stack_pointer();
 
