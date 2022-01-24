@@ -1,0 +1,51 @@
+./.submitscript/src/main.sh: line 36: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8): No such file or directory
+Identified Python 3.10.1 at /usr/bin/python3.10
+[Bootstrap] Identified pip 20.3.4 from /usr/lib/python3.10/site-packages/pip (python 3.10)' at /usr/bin/python3.10 -m pip
+[Bootstrap] Identified 'pipenv, version 2022.1.8' at /usr/bin/python3.10 -m pipenv
+[Bootstrap] Running '/usr/bin/python3.10 -m pipenv install --python 3.10' to ensure the existence of a virtual environment.
+[Bootstrap] This may take a moment.
+Virtualenv already exists!
+Removing existing virtualenv...
+Creating a virtualenv for this project...
+Pipfile: /home/phfn/workspace/spl-compiler/.submitscript/src/Pipfile
+Using /usr/bin/python3 (3.10.1) to create virtualenv...
+⠋ Creating virtual environment...⠙ Creating virtual environment...⠹ Creating virtual environment...⠸ Creating virtual environment...⠼ Creating virtual environment...⠴ Creating virtual environment...⠦ Creating virtual environment...created virtual environment CPython3.10.1.final.0-64 in 269ms
+  creator CPython3Posix(dest=/home/phfn/.local/share/virtualenvs/src-PVvFRySF, clear=False, no_vcs_ignore=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/phfn/.local/share/virtualenv)
+    added seed packages: pip==21.3.1, setuptools==60.2.0, wheel==0.37.1
+  activators BashActivator,CShellActivator,FishActivator,NushellActivator,PowerShellActivator,PythonActivator
+
+✔ Successfully created virtual environment! 
+Virtualenv location: /home/phfn/.local/share/virtualenvs/src-PVvFRySF
+Installing dependencies from Pipfile.lock (da6003)...
+An error occurred while installing pathlib==1.0.1 --hash=sha256:6940718dfc3eff4258203ad5021090933e5c04707d5ca8cc9e73c94a7894ea9f! Will try again.
+Installing initially failed dependencies...
+[pipenv.exceptions.InstallError]: Collecting pathlib==1.0.1
+[pipenv.exceptions.InstallError]:   Using cached pathlib-1.0.1.tar.gz (49 kB)
+[pipenv.exceptions.InstallError]:   Preparing metadata (setup.py): started
+[pipenv.exceptions.InstallError]:   Preparing metadata (setup.py): finished with status 'error'
+[pipenv.exceptions.InstallError]: ERROR: Command errored out with exit status 1:
+[pipenv.exceptions.InstallError]:    command: /home/phfn/.local/share/virtualenvs/src-PVvFRySF/bin/python -c 'import io, os, sys, setuptools, tokenize; sys.argv[0] = '"'"'/tmp/pip-install-tqe5j1hx/pathlib_f3e140e5ccfa41acbe5057523d64dce2/setup.py'"'"'; __file__='"'"'/tmp/pip-install-tqe5j1hx/pathlib_f3e140e5ccfa41acbe5057523d64dce2/setup.py'"'"';f = getattr(tokenize, '"'"'open'"'"', open)(__file__) if os.path.exists(__file__) else io.StringIO('"'"'from setuptools import setup; setup()'"'"');code = f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' egg_info --egg-base /tmp/pip-pip-egg-info-am424ld7
+[pipenv.exceptions.InstallError]:        cwd: /tmp/pip-install-tqe5j1hx/pathlib_f3e140e5ccfa41acbe5057523d64dce2/
+[pipenv.exceptions.InstallError]:   Complete output (13 lines):
+[pipenv.exceptions.InstallError]:   Traceback (most recent call last):
+[pipenv.exceptions.InstallError]:     File "<string>", line 1, in <module>
+[pipenv.exceptions.InstallError]:     File "/home/phfn/.local/share/virtualenvs/src-PVvFRySF/lib/python3.10/site-packages/setuptools/__init__.py", line 16, in <module>
+[pipenv.exceptions.InstallError]:       import setuptools.version
+[pipenv.exceptions.InstallError]:     File "/home/phfn/.local/share/virtualenvs/src-PVvFRySF/lib/python3.10/site-packages/setuptools/version.py", line 1, in <module>
+[pipenv.exceptions.InstallError]:       import pkg_resources
+[pipenv.exceptions.InstallError]:     File "/home/phfn/.local/share/virtualenvs/src-PVvFRySF/lib/python3.10/site-packages/pkg_resources/__init__.py", line 23, in <module>
+[pipenv.exceptions.InstallError]:       import zipfile
+[pipenv.exceptions.InstallError]:     File "/usr/lib/python3.10/zipfile.py", line 19, in <module>
+[pipenv.exceptions.InstallError]:       import pathlib
+[pipenv.exceptions.InstallError]:     File "/tmp/pip-install-tqe5j1hx/pathlib_f3e140e5ccfa41acbe5057523d64dce2/pathlib.py", line 10, in <module>
+[pipenv.exceptions.InstallError]:       from collections import Sequence
+[pipenv.exceptions.InstallError]:   ImportError: cannot import name 'Sequence' from 'collections' (/usr/lib/python3.10/collections/__init__.py)
+[pipenv.exceptions.InstallError]:   ----------------------------------------
+[pipenv.exceptions.InstallError]: WARNING: Discarding https://files.pythonhosted.org/packages/ac/aa/9b065a76b9af472437a0059f77e8f962fe350438b927cb80184c32f075eb/pathlib-1.0.1.tar.gz#sha256=6940718dfc3eff4258203ad5021090933e5c04707d5ca8cc9e73c94a7894ea9f (from https://pypi.org/simple/pathlib/). Command errored out with exit status 1: python setup.py egg_info Check the logs for full command output.
+[pipenv.exceptions.InstallError]: ERROR: Could not find a version that satisfies the requirement pathlib==1.0.1 (from versions: 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.97, 1.0, 1.0.1)
+[pipenv.exceptions.InstallError]: ERROR: No matching distribution found for pathlib==1.0.1
+ERROR: Couldn't install package: pathlib
+ Package installation failed...
+[Bootstrap] Installing script dependencies failed.
+[Bootstrap] I will now try to remove and recreate a potentially existing virtual environment.
