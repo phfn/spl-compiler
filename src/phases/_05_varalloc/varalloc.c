@@ -252,6 +252,7 @@ int calcOutgoingAreaSize(StatementList *body, SymbolTable *global_table){
 				statement_size = calcOutgoingAreaSize(current->u.compoundStatement.statements, global_table);
                 break;
 			case STATEMENT_WHILESTATEMENT:
+			case STATEMENT_DOWHILESTATEMENT:
 				;
 				StatementList *while_wrapper = newStatementList(current->u.whileStatement.body, emptyStatementList());
 				statement_size = calcOutgoingAreaSize(while_wrapper, global_table);

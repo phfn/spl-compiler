@@ -112,6 +112,7 @@ ref						{return symbol(REF);}
 type					{return symbol(TYPE);}
 var						{return symbol(VAR);}
 while					{return symbol(WHILE);}
+do						{return symbol(DO);}
 
 "("						{return symbol(LPAREN);}
 ")"						{return symbol(RPAREN);}

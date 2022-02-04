@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <util/errors.h>
 #include <assert.h>
+#include <wchar.h>
 #include "absyn/_declarations.h"
 #include "absyn/expressions.h"
 #include "absyn/global_declarations.h"
@@ -27,7 +28,7 @@
 #define FRAME_POINTER  25
 #define STACK_POINTER  29
 
-//#define COMPATIBLE_MODE
+#define COMPATIBLE_MODE
 int register_stack_pointer = FIRST_REGISTER - 1;
 int label_counter = 0;
 
@@ -53,7 +54,7 @@ int pushc(int value, FILE *out){
 void genLoadVariableAddress(Variable *variable, SymbolTable *local_table, FILE *out);
 void genStatement(Statement *statement, SymbolTable *local_table, FILE *out);
 void genStatementList(StatementList *statement_list, SymbolTable *local_table, FILE *out);
-bool VariableIsRef(Variable *variable, SymbolTable *local_table, FILE *out);
+void genComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, int op2, char* label);
 
 /**
  * Emits needed import statements, to allow usage of the predefined functions and sets the correct settings
@@ -85,27 +86,52 @@ void write_comment(FILE *out, char *format) {
 #endif
 
 }
+BinaryOperator getReversedOperator(BinaryOperator operator){
+	
+	switch(operator){
+		case ABSYN_OP_EQU:
+			return ABSYN_OP_NEQ;
+		case ABSYN_OP_NEQ:
+			return ABSYN_OP_EQU;
+		case ABSYN_OP_GRT:
+			return ABSYN_OP_LSE;
+		case ABSYN_OP_GRE:
+			return ABSYN_OP_LST;
+		case ABSYN_OP_LST:
+			return ABSYN_OP_GRE;
+		case ABSYN_OP_LSE:
+			return ABSYN_OP_GRT;
+		default:
+			error("Expected comparison operator but found arithmetic");
+		}
+	return -1;
+}
+
 
 void genReversedComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, int op2, char* label){
+	genComparisonBinaryOperator(getReversedOperator(operator), out, op1, op2, label);
+}
+
+void genComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, int op2, char* label){
 	write_comment(out, "comparison operator");
 	switch(operator){
 		case ABSYN_OP_EQU:
-			emitRRL(out, "bne", op1, op2, label);
-			break;
-		case ABSYN_OP_NEQ:
 			emitRRL(out, "beq", op1, op2, label);
 			break;
+		case ABSYN_OP_NEQ:
+			emitRRL(out, "bne", op1, op2, label);
+			break;
 		case ABSYN_OP_GRT:
-			emitRRL(out, "ble", op1, op2, label);
+			emitRRL(out, "bgt", op1, op2, label);
 			break;
 		case ABSYN_OP_GRE:
-			emitRRL(out, "blt", op1, op2, label);
-			break;
-		case ABSYN_OP_LST:
 			emitRRL(out, "bge", op1, op2, label);
 			break;
+		case ABSYN_OP_LST:
+			emitRRL(out, "blt", op1, op2, label);
+			break;
 		case ABSYN_OP_LSE:
-			emitRRL(out, "bgt", op1, op2, label);
+			emitRRL(out, "ble", op1, op2, label);
 			break;
 		default:
 			error("Expected comparison operator but found arithmetic");
@@ -161,6 +187,19 @@ void genArithmeticBinaryExpression(Expression *expression, SymbolTable *local_ta
 	genExpression(rightOperand, local_table, out);
 	genArithmeticBinaryOperator(operator, out);
 }
+void genJumpIfComparisonIsTrue(Expression *comparisonExpression, SymbolTable *local_table, FILE *out, char* label){
+	Expression *leftOperand = comparisonExpression->u.binaryExpression.leftOperand;
+	Expression *rightOperand = comparisonExpression->u.binaryExpression.rightOperand;
+	BinaryOperator operator = comparisonExpression->u.binaryExpression.operator;
+
+	genExpression(leftOperand, local_table, out);
+	int index_left = register_stack_pointer;
+	genExpression(rightOperand, local_table, out);
+	int index_right = register_stack_pointer;
+	genComparisonBinaryOperator(operator, out, index_left, index_right, label);
+	decrease_stack_pointer();
+	decrease_stack_pointer();
+}
 void genJumpIfComparisonIsFalse(Expression *comparisonExpression, SymbolTable *local_table, FILE *out, char* label){
 	Expression *leftOperand = comparisonExpression->u.binaryExpression.leftOperand;
 	Expression *rightOperand = comparisonExpression->u.binaryExpression.rightOperand;
@@ -188,12 +227,6 @@ void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 			break;
 	}
 }
-
-void genLoadVariable(Variable *variable, SymbolTable *local_table, FILE *out){
-	genLoadVariableAddress(variable, local_table, out);
-	emitRRI(out, "ldw", register_stack_pointer, register_stack_pointer, 0);
-}
-
 
 /**
  * Load a variable and put its address on the register stack
@@ -244,16 +277,6 @@ void genLoadVariableAddress(Variable *variable, SymbolTable *local_table, FILE *
 
 			break;
 	}
-}
-
-bool VariableIsRef(Variable *variable, SymbolTable *local_table, FILE *out){
-	if(variable->kind == VARIABLE_ARRAYACCESS){
-		return VariableIsRef(variable->u.arrayAccess.array, local_table, out);
-	}
-	if(lookup(local_table, variable->u.namedVariable.name)->u.varEntry.isRef){
-		return true;
-	}
-	return false;
 }
 
 void genAssignStatement(Statement *statement, SymbolTable *local_table, FILE *out){
@@ -313,6 +336,25 @@ void genIfStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	emitLabel(out, endif_label);
 #endif
 
+}
+void genDoWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out){
+	write_comment(out, "while_statement");
+	Expression *condition = statement->u.whileStatement.condition;
+	Statement *body = statement->u.whileStatement.body;
+
+	int label_index = label_counter++;
+	char start_label[100] ;
+
+#ifdef COMPATIBLE_MODE
+	sprintf(start_label, "L%d", label_index);
+#else
+	sprintf(start_label, "while_start_%d", label_index);
+#endif
+
+	emitLabel(out, start_label);
+	genStatement(body, local_table, out);
+	genJumpIfComparisonIsTrue(condition, local_table, out, start_label);
+	
 }
 void genWhileStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 	write_comment(out, "while_statement");
@@ -409,6 +451,9 @@ void genStatement(Statement *statement, SymbolTable *local_table, FILE *out){
 		case STATEMENT_WHILESTATEMENT:
 			genWhileStatement(statement, local_table, out);
 			break;
+		case STATEMENT_DOWHILESTATEMENT:
+			genDoWhileStatement(statement, local_table, out);
+			break;
 		case STATEMENT_COMPOUNDSTATEMENT:
 			genCompoundStatement(statement, local_table, out);
 			break;
@@ -470,9 +515,6 @@ void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTabl
 	commentR(out, "jr", 31, "return");
 	
 }
-void genTypeDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTable *globalTable, FILE *out){
-	notImplemented();
-}
 
 void genCode(Program *program, SymbolTable *globalTable, FILE *out, bool ershovOptimization) {
     assemblerProlog(out);
@@ -488,10 +530,6 @@ void genCode(Program *program, SymbolTable *globalTable, FILE *out, bool ershovO
 			case DECLARATION_PROCEDUREDECLARATION:
 				genProcedureDeclaration(current, globalTable, out);
 			break;
-			case DECLARATION_TYPEDECLARATION:
-				genTypeDeclaration(current, globalTable, out);
-			break;
-
 		}
 	}
 

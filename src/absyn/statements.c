@@ -50,6 +50,13 @@ Statement *newWhileStatement(Position position, Expression *condition, Statement
     return node;
 }
 
+Statement *newDoWhileStatement(Position position, Expression *condition, Statement *body){
+    Statement *node = newStatement(position, STATEMENT_DOWHILESTATEMENT);
+    node->u.whileStatement.condition = condition;
+    node->u.whileStatement.body = body;
+    return node;
+}
+
 Statement *newCallStatement(Position position, Identifier *name, ExpressionList *arguments) {
     Statement *node = newStatement(position, STATEMENT_CALLSTATEMENT);
     node->u.callStatement.procedureName = name;

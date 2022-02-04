@@ -19,6 +19,7 @@ typedef enum {
     STATEMENT_ASSIGNSTATEMENT,
     STATEMENT_IFSTATEMENT,
     STATEMENT_WHILESTATEMENT,
+    STATEMENT_DOWHILESTATEMENT,
     STATEMENT_CALLSTATEMENT
 } statement_kind;
 
@@ -121,6 +122,15 @@ Statement *newIfStatement(Position position, Expression *condition, Statement *t
  * @return A pointer to a newly created node.
  */
 Statement *newWhileStatement(Position position, Expression *condition, Statement *body);
+
+/**
+ * Creates a new node representing a do-while-statement.
+ * @param line The position of the statement in the source code.
+ * @param condition The expression used to determine whether the while-loop should continue.
+ * @param body The statement executed until the condition evaluates to false.
+ * @return A pointer to a newly created node.
+ */
+Statement *newDoWhileStatement(Position position, Expression *condition, Statement *body);
 
 /**
  * Creates a new node representing a procedure call.

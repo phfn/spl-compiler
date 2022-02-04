@@ -49,7 +49,7 @@ void yyerror(Program**, char *);
 }
 
 %token	<noVal>		ARRAY ELSE IF OF PROC
-%token	<noVal>		REF TYPE VAR WHILE
+%token	<noVal>		REF TYPE VAR WHILE DO
 %token	<noVal>		LPAREN RPAREN LBRACK
 %token	<noVal>		RBRACK LCURL RCURL
 %token	<noVal>		EQ NE LT LE GT GE
@@ -82,6 +82,7 @@ void yyerror(Program**, char *);
 %type	<statement>				AssignStatement
 %type	<statement>				IfStatement
 %type	<statement>				WhileStatement
+%type	<statement>				DoWhileStatement
 %type	<statement>				CallStatement
 
 %type	<expressionList>		ExpressionList
@@ -183,7 +184,7 @@ Statement						: CallStatement { $$ = $1; }
 								| IfStatement { $$ = $1; }
 								| WhileStatement { $$ = $1; }
 								| EmptyStatement { $$ = $1; }
-								/* | DoWhileStatement */
+								| DoWhileStatement { $$ = $1; }
 								;
 
 EmptyStatement					: SEMIC
@@ -207,6 +208,8 @@ IfStatement						: IF LPAREN Expression RPAREN Statement
 WhileStatement					: WHILE LPAREN Expression RPAREN Statement
 									{ $$ = newWhileStatement($1.position, $3, $5); }
 								;
+DoWhileStatement				: DO Statement WHILE LPAREN Expression RPAREN SEMIC
+									{ $$ = newDoWhileStatement($1.position, $5, $2); }
 
 CallStatement					: IDENT LPAREN ExpressionList RPAREN SEMIC
 									{ $$ = newCallStatement($1.position, $1.val, $3); }

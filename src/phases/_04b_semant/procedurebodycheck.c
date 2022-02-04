@@ -228,6 +228,7 @@ void checkStatement(
 			checkStatement(statement->u.ifStatement.thenPart, local_table);
 			checkStatement(statement->u.ifStatement.elsePart, local_table);
             break;
+        case STATEMENT_DOWHILESTATEMENT:
         case STATEMENT_WHILESTATEMENT:
 			;
 			Expression *while_condition = statement->u.whileStatement.condition;
@@ -236,8 +237,6 @@ void checkStatement(
 				whileConditionMustBeBoolean(statement->position);
 			}
 			checkStatement(statement->u.whileStatement.body, local_table);
-            break;
-
             break;
         case STATEMENT_EMPTYSTATEMENT:
             break;
