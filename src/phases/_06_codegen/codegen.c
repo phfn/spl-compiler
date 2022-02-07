@@ -532,6 +532,4 @@ void genCode(Program *program, SymbolTable *globalTable, FILE *out, bool ershovO
 			break;
 		}
 	}
-
-    notImplemented();
 }
