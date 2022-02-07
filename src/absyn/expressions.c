@@ -3,6 +3,7 @@
  */
 
 #include "expressions.h"
+#include "phases/_06_codegen/ershov.h"
 #include "variables.h"
 
 #include <stddef.h>
@@ -45,6 +46,7 @@ Expression *newExpression(Position position, expression_kind kind) {
     node->position = position;
     node->kind = kind;
     node->dataType = NULL;
+	node->ershov = -1;
     return node;
 }
 
@@ -53,18 +55,21 @@ Expression *newBinaryExpression(Position position, BinaryOperator op, Expression
     node->u.binaryExpression.operator = op;
     node->u.binaryExpression.leftOperand = left;
     node->u.binaryExpression.rightOperand = right;
+	node->ershov = calc_ershov(node);
     return node;
 }
 
 Expression *newVariableExpression(Position position, Variable *var) {
     Expression *node = newExpression(position, EXPRESSION_VARIABLEEXPRESSION);
     node->u.variableExpression.variable = var;
+	node->ershov = calc_ershov(node);
     return node;
 }
 
 Expression *newIntLiteral(Position position, int val) {
     Expression *node = newExpression(position, EXPRESSION_INTLITERAL);
     node->u.intLiteral.value = val;
+	node->ershov = calc_ershov(node);
     return node;
 }
 

@@ -21,6 +21,7 @@
 #include "table/identifier.h"
 #include "table/table.h"
 #include "types/types.h"
+#include "ershov.h"
 
 #define FIRST_REGISTER 8
 #define LAST_REGISTER 23
@@ -183,8 +184,13 @@ void genArithmeticBinaryExpression(Expression *expression, SymbolTable *local_ta
 	Expression *rightOperand = expression->u.binaryExpression.rightOperand;
 	BinaryOperator operator = expression->u.binaryExpression.operator;
 
-	genExpression(leftOperand, local_table, out);
-	genExpression(rightOperand, local_table, out);
+	if (leftOperand->ershov >= rightOperand->ershov) {
+		genExpression(leftOperand, local_table, out);
+		genExpression(rightOperand, local_table, out);
+	}else{
+		genExpression(rightOperand, local_table, out);
+		genExpression(leftOperand, local_table, out);
+	}
 	genArithmeticBinaryOperator(operator, out);
 }
 void genJumpIfComparisonIsTrue(Expression *comparisonExpression, SymbolTable *local_table, FILE *out, char* label){
@@ -192,10 +198,18 @@ void genJumpIfComparisonIsTrue(Expression *comparisonExpression, SymbolTable *lo
 	Expression *rightOperand = comparisonExpression->u.binaryExpression.rightOperand;
 	BinaryOperator operator = comparisonExpression->u.binaryExpression.operator;
 
-	genExpression(leftOperand, local_table, out);
-	int index_left = register_stack_pointer;
-	genExpression(rightOperand, local_table, out);
-	int index_right = register_stack_pointer;
+	int index_left, index_right;
+	if (leftOperand->ershov >= rightOperand->ershov) {
+		genExpression(leftOperand, local_table, out);
+		index_left = register_stack_pointer;
+		genExpression(rightOperand, local_table, out);
+		index_right = register_stack_pointer;
+	}else{
+		genExpression(rightOperand, local_table, out);
+		index_right = register_stack_pointer;
+		genExpression(leftOperand, local_table, out);
+		index_left = register_stack_pointer;
+	}
 	genComparisonBinaryOperator(operator, out, index_left, index_right, label);
 	decrease_stack_pointer();
 	decrease_stack_pointer();
@@ -205,10 +219,18 @@ void genJumpIfComparisonIsFalse(Expression *comparisonExpression, SymbolTable *l
 	Expression *rightOperand = comparisonExpression->u.binaryExpression.rightOperand;
 	BinaryOperator operator = comparisonExpression->u.binaryExpression.operator;
 
-	genExpression(leftOperand, local_table, out);
-	int index_left = register_stack_pointer;
-	genExpression(rightOperand, local_table, out);
-	int index_right = register_stack_pointer;
+	int index_left, index_right;
+	if (leftOperand->ershov >= rightOperand->ershov) {
+		genExpression(leftOperand, local_table, out);
+		index_left = register_stack_pointer;
+		genExpression(rightOperand, local_table, out);
+		index_right = register_stack_pointer;
+	}else{
+		genExpression(rightOperand, local_table, out);
+		index_right = register_stack_pointer;
+		genExpression(leftOperand, local_table, out);
+		index_left = register_stack_pointer;
+	}
 	genReversedComparisonBinaryOperator(operator, out, index_left, index_right, label);
 	decrease_stack_pointer();
 	decrease_stack_pointer();

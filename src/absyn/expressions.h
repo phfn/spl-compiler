@@ -75,6 +75,7 @@ typedef struct expression {
     Position position;
     expression_kind kind;
     Type *dataType;
+	int ershov;
     union {
         struct {
             BinaryOperator operator;
