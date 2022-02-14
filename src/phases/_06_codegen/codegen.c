@@ -139,6 +139,26 @@ void genComparisonBinaryOperator(BinaryOperator operator, FILE *out, int op1, in
 		}
 
 }
+void genReversedArithmeticBinaryOperator(BinaryOperator operator, FILE *out){
+	write_comment(out, "arithmetic operator");
+	switch(operator){
+		case ABSYN_OP_ADD:;
+			emitRRR(out, "add", register_stack_pointer-1, register_stack_pointer, register_stack_pointer-1);
+			break;
+		case ABSYN_OP_SUB:
+			emitRRR(out, "sub", register_stack_pointer-1, register_stack_pointer, register_stack_pointer-1);
+			break;
+		case ABSYN_OP_MUL:
+			emitRRR(out, "mul", register_stack_pointer-1, register_stack_pointer, register_stack_pointer-1);
+			break;
+		case ABSYN_OP_DIV:
+			emitRRR(out, "div", register_stack_pointer-1, register_stack_pointer, register_stack_pointer-1);
+			break;
+		default:
+			error("Expected arithetic operator but found comparision");
+	}
+	decrease_stack_pointer();
+}
 void genArithmeticBinaryOperator(BinaryOperator operator, FILE *out){
 	write_comment(out, "arithmetic operator");
 	switch(operator){
@@ -187,11 +207,12 @@ void genArithmeticBinaryExpression(Expression *expression, SymbolTable *local_ta
 	if (leftOperand->ershov >= rightOperand->ershov) {
 		genExpression(leftOperand, local_table, out);
 		genExpression(rightOperand, local_table, out);
+		genArithmeticBinaryOperator(operator, out);
 	}else{
 		genExpression(rightOperand, local_table, out);
 		genExpression(leftOperand, local_table, out);
+		genReversedArithmeticBinaryOperator(operator, out);
 	}
-	genArithmeticBinaryOperator(operator, out);
 }
 void genJumpIfComparisonIsTrue(Expression *comparisonExpression, SymbolTable *local_table, FILE *out, char* label){
 	Expression *leftOperand = comparisonExpression->u.binaryExpression.leftOperand;
