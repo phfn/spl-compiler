@@ -4,6 +4,8 @@
 #include "absyn/expressions.h"
 #include "absyn/global_declarations.h"
 #include "absyn/lists.h"
+#include "absyn/variables.h"
+#include <stdlib.h>
 
 // void initializeErshov(GlobalDeclarationList *gdl){
 // 	GlobalDeclaration *current_global_declaration;
@@ -26,13 +28,39 @@
 // 	}
 //
 // }
+//
+int calc_ershov_var(Variable *var){
+	switch (var->kind) {
+		case VARIABLE_NAMEDVARIABLE:
+			return var->ershov;
+			break;
+		case VARIABLE_ARRAYACCESS:
+			;
+			int a, b;
+			a = var->u.arrayAccess.array->ershov;
+			if (var->u.arrayAccess.index->ershov < 2){
+				var->u.arrayAccess.index->ershov = 2;
+			}
+			b = var->u.arrayAccess.index->ershov;
+			if(a>b){
+				return a;
+			}
+			if(b>a){
+				return b;
+			}
+			return a + 1;
+
+			break;
+		default:
+			exit(1);
+	}
+}
 int calc_ershov(Expression *exp){
 	switch (exp->kind) {
 		case EXPRESSION_INTLITERAL:
 			return 1;
 		case EXPRESSION_VARIABLEEXPRESSION:
-			//TODO arr[1+1]
-			return 1;
+			return exp->u.variableExpression.variable->ershov;
 		case EXPRESSION_BINARYEXPRESSION:
 			;
 			int a, b;
@@ -45,5 +73,7 @@ int calc_ershov(Expression *exp){
 				return b;
 			}
 			return a + 1;
+		default:
+			exit(1);
 	}
 }

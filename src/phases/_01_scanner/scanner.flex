@@ -112,7 +112,11 @@ ref						{return symbol(REF);}
 type					{return symbol(TYPE);}
 var						{return symbol(VAR);}
 while					{return symbol(WHILE);}
-do						{return symbol(DO);}
+do						{if(commandLineOptions->doWhileEnabled){
+							return symbol(DO);
+						}else{
+							return symbolIdentVal(IDENT, newIdentifier(yytext));
+						}}
 
 "("						{return symbol(LPAREN);}
 ")"						{return symbol(RPAREN);}
@@ -144,4 +148,4 @@ do						{return symbol(DO);}
 
 .|\n                    {illegalCharacter(currentPosition, yytext[0]);}
 
-%%
+cann%

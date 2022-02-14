@@ -33,6 +33,7 @@ typedef struct variable {
     Position position;
     variable_kind kind;
     Type *dataType;
+	int ershov;
     union {
         struct {
             Identifier *name;

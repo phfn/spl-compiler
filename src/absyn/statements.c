@@ -100,6 +100,13 @@ static void printWhileStatement(FILE *out, int indentation, Statement *self) {
     fprintf(out, ")");
 }
 
+static void printDoWhileStatement(FILE *out, int indentation, Statement *self) {
+    fprintf(out, "DoWhileStatement(\n");
+    printStatement(out, indentation + INDENTATION_INCREMENT, self->u.whileStatement.body);
+    fprintf(out, ",\n");
+    printExpression(out, indentation + INDENTATION_INCREMENT, self->u.whileStatement.condition);
+    fprintf(out, ")");
+}
 static void printCallStatement(FILE *out, int indentation, Statement *self) {
 
     fprintf(out, "CallStatement(\n");
@@ -135,6 +142,9 @@ void printStatement(FILE *out, int indentation, Statement *self) {
         case STATEMENT_IFSTATEMENT:
             printIfStatement(out, indentation, self);
             break;
+        case STATEMENT_DOWHILESTATEMENT:
+            printDoWhileStatement(out, indentation, self);
+			break;
         case STATEMENT_WHILESTATEMENT:
             printWhileStatement(out, indentation, self);
             break;

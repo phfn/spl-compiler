@@ -5,5 +5,6 @@
 #include "absyn/expressions.h"
 
 int calc_ershov(Expression *exp);
+int calc_ershov_var(Variable *var);
 
 #endif

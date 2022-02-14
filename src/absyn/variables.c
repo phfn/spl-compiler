@@ -5,8 +5,10 @@
 #include <stddef.h>
 #include <util/memory.h>
 #include <absyn/printing/printing_helpers.h>
+#include "phases/_06_codegen/ershov.h"
 #include "variables.h"
 #include "expressions.h"
+#include "phases/_06_codegen/ershov.h"
 
 static Variable *newVariable(Position position, variable_kind kind) {
     Variable *node = new(Variable);
@@ -20,6 +22,7 @@ static Variable *newVariable(Position position, variable_kind kind) {
 Variable *newNamedVariable(Position position, Identifier *name) {
     Variable *node = newVariable(position, VARIABLE_NAMEDVARIABLE);
     node->u.namedVariable.name = name;
+	node->ershov = 1;
     return node;
 }
 
@@ -27,6 +30,7 @@ Variable *newArrayAccess(Position position, Variable *var, Expression *index) {
     Variable *node = newVariable(position, VARIABLE_ARRAYACCESS);
     node->u.arrayAccess.array = var;
     node->u.arrayAccess.index = index;
+	node->ershov = calc_ershov_var(node);
     return node;
 }
 

@@ -15,6 +15,7 @@
 #include "absyn/statements.h"
 #include "absyn/variables.h"
 #include "codeprint.h"
+#include "command_line_options.h"
 #include "phases/_05_varalloc/stack_layout.h"
 #include "phases/_05_varalloc/varalloc.h"
 #include "table/entry.h"
@@ -30,6 +31,7 @@
 #define STACK_POINTER  29
 
 #define COMPATIBLE_MODE
+static bool ershovEnabled;
 int register_stack_pointer = FIRST_REGISTER - 1;
 int label_counter = 0;
 
@@ -204,7 +206,7 @@ void genArithmeticBinaryExpression(Expression *expression, SymbolTable *local_ta
 	Expression *rightOperand = expression->u.binaryExpression.rightOperand;
 	BinaryOperator operator = expression->u.binaryExpression.operator;
 
-	if (leftOperand->ershov >= rightOperand->ershov) {
+	if (!ershovEnabled || leftOperand->ershov >= rightOperand->ershov) {
 		genExpression(leftOperand, local_table, out);
 		genExpression(rightOperand, local_table, out);
 		genArithmeticBinaryOperator(operator, out);
@@ -220,7 +222,7 @@ void genJumpIfComparisonIsTrue(Expression *comparisonExpression, SymbolTable *lo
 	BinaryOperator operator = comparisonExpression->u.binaryExpression.operator;
 
 	int index_left, index_right;
-	if (leftOperand->ershov >= rightOperand->ershov) {
+	if (!ershovEnabled || leftOperand->ershov >= rightOperand->ershov) {
 		genExpression(leftOperand, local_table, out);
 		index_left = register_stack_pointer;
 		genExpression(rightOperand, local_table, out);
@@ -241,7 +243,7 @@ void genJumpIfComparisonIsFalse(Expression *comparisonExpression, SymbolTable *l
 	BinaryOperator operator = comparisonExpression->u.binaryExpression.operator;
 
 	int index_left, index_right;
-	if (leftOperand->ershov >= rightOperand->ershov) {
+	if (!ershovEnabled || leftOperand->ershov >= rightOperand->ershov) {
 		genExpression(leftOperand, local_table, out);
 		index_left = register_stack_pointer;
 		genExpression(rightOperand, local_table, out);
@@ -271,6 +273,17 @@ void genExpression(Expression *expression, SymbolTable *local_table, FILE *out){
 	}
 }
 
+void genIndex(Expression *index, Variable* array, SymbolTable *local_table, FILE *out){
+	genExpression(index, local_table, out); // write the result of the index expression. Here 5
+	int address_index = register_stack_pointer;
+
+	//check index as unsigned int
+	// jump when index >= array size
+	int index_array_size = pushc(array->dataType->u.arrayType.size, out);
+	emitRRL(out, "bgeu", address_index, index_array_size, "_indexError");
+	decrease_stack_pointer();// remove array size
+}
+
 /**
  * Load a variable and put its address on the register stack
  * When variable is an array-access, it loads the adress of the array + the offset of the index
@@ -297,17 +310,21 @@ void genLoadVariableAddress(Variable *variable, SymbolTable *local_table, FILE *
 			write_comment(out, "variable, array access");
 			Variable *array = variable->u.arrayAccess.array;
 			Expression *index = variable->u.arrayAccess.index;
-			genLoadVariableAddress(array, local_table, out); // write address of arr on the stack
-			int address_array = register_stack_pointer;
+			int address_array, address_index;
+			if (!ershovEnabled || array->ershov>index->ershov) {
+				genLoadVariableAddress(array, local_table, out); // write address of arr on the stack
+				address_array = register_stack_pointer;
 
-			genExpression(index, local_table, out); // write the result of the index expression. Here 5
-			int address_index = register_stack_pointer; 
+				genIndex(index, array, local_table, out);
+				address_index = register_stack_pointer; 
+			}else{
+				genIndex(index, array, local_table, out);
+				address_index = register_stack_pointer; 
 
-			//check index as unsigned int
-			// jump when index >= array size
-			int index_array_size = pushc(array->dataType->u.arrayType.size, out);
-			emitRRL(out, "bgeu", address_index, index_array_size, "_indexError");
-			decrease_stack_pointer();// remove array size
+				genLoadVariableAddress(array, local_table, out); // write address of arr on the stack
+				address_array = register_stack_pointer;
+			}
+
 
 			//calculate offset = index * byteSize of baseType . In our example 5*4
 			emitRRI(out, "mul", register_stack_pointer, address_index, array->dataType->u.arrayType.baseType->byteSize);
@@ -560,6 +577,8 @@ void genProcedureDeclaration(GlobalDeclaration *procedureDeclaration, SymbolTabl
 }
 
 void genCode(Program *program, SymbolTable *globalTable, FILE *out, bool ershovOptimization) {
+	ershovEnabled = ershovOptimization;
+
     assemblerProlog(out);
 
     //TODO (assignment 6): generate eco32 assembler code for the spl program
