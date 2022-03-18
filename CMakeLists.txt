@@ -62,6 +62,7 @@ add_executable(
         src/util/memory.c
         src/util/ascii_table.c
         src/util/string_ops.c
+        src/phases/_06_codegen/ershov.c
 )
 
 add_custom_target( _generated_source_folder_dummy_target
